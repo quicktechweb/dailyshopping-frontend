@@ -185,7 +185,7 @@ export default function Footer() {
 
     {/* Center */}
     <span className="absolute left-1/2 -translate-x-1/2 text-gray-500">
-      Designed &amp; Developed by <span className="font-semibold text-gray-700">QuickTech IT</span>
+      Designed &amp; Developed by <span className="font-semibold text-gray-700">Daily Shopping Team</span>
     </span>
 
     {/* Right */}
