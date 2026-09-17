@@ -53,7 +53,7 @@ const [imageFile, setImageFile] = useState(null);
 
     const fetchWishlist = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/wishlist", {
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/wishlist", {
           params: { email, phone },
         });
         setWishlist(res.data);
@@ -78,7 +78,7 @@ const [imageFile, setImageFile] = useState(null);
 useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch("https://dailyshopping-backend.onrender.com/api/products");
         const data = await res.json();
         setProducts(data);
       } catch (err) {
@@ -234,7 +234,7 @@ const handleImageSearch = async (file) => {
     formData.append("image", file);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/products/image-search", formData);
+      const res = await axios.post("https://dailyshopping-backend.onrender.com/api/products/image-search", formData);
       if (res.data && res.data.length > 0) {
         // Smooth transition effect before navigation
         document.body.style.opacity = "0.7";
@@ -266,7 +266,7 @@ const handleImageSearch = async (file) => {
   // };
 const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/navbarcategory");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/navbarcategory");
       const data = res.data;
 
       // Filter by type
@@ -310,7 +310,7 @@ const fetchCategories = async () => {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/products/searchvalue?q=${search}`
+        `https://dailyshopping-backend.onrender.com/api/products/searchvalue?q=${search}`
       );
 
       const products = res.data.data;
@@ -841,7 +841,7 @@ const fetchCategories = async () => {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/products/searchvalue?q=${search}`
+        `https://dailyshopping-backend.onrender.com/api/products/searchvalue?q=${search}`
       );
 
       const products = res.data.data;

@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { FaApple, FaGooglePlay, FaStar, FaTag, FaTruck } from "react-icons/fa";
 
-const BASE_URL = "http://localhost:5000/api/promocardsection";
+const BASE_URL = "https://dailyshopping-backend.onrender.com/api/promocardsection";
 
 const PromoCardSection = () => {
   const [promoData, setPromoData] = useState(null);

@@ -25,7 +25,7 @@ export default function Message() {
     if (!sellerId) return;
 
     axios
-      .get(`http://localhost:5000/api/chat/conversations/seller/${sellerId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/chat/conversations/seller/${sellerId}`)
       .then((res) => setConversations(res.data.conversations));
 
     if (!socket.connected) socket.connect();
@@ -51,7 +51,7 @@ export default function Message() {
 
   const openConversation = async (conv) => {
     setActive(conv);
-    const res = await axios.get(`http://localhost:5000/api/chat/messages/${conv._id}`);
+    const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/chat/messages/${conv._id}`);
     setMessages(res.data.messages);
     socket.emit("mark_read", { conversationId: conv._id, role: "seller" });
     setConversations((prev) =>

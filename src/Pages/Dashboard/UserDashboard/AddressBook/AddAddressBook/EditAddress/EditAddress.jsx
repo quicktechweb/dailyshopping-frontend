@@ -32,7 +32,7 @@ const EditAddress = () => {
     const fetchAddress = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`
+          `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}/${addressId}`
         );
         if (res.data.success) {
           const a = res.data.address;
@@ -65,7 +65,7 @@ const EditAddress = () => {
     setSaving(true);
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`,
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}/${addressId}`,
         form
       );
       if (res.data.success) {
@@ -84,7 +84,7 @@ const EditAddress = () => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}/${addressId}`
       );
       if (res.data.success) {
         alert("Address deleted successfully");

@@ -263,7 +263,7 @@ const phone = user?.phoneNumber || user?.phone || "";
 
   try {
     const res = await axios.post(
-      "http://localhost:5000/api/wishlist",
+      "https://dailyshopping-backend.onrender.com/api/wishlist",
       payload,
       { headers: { "Content-Type": "application/json" } }
     );
@@ -316,7 +316,7 @@ useEffect(() => {
   if (!product?.sellerId) return;
   const followUserId = user?.uid || user?._id || user?.userId;
   axios
-    .get(`http://localhost:5000/api/seller-follow/status`, {
+    .get(`https://dailyshopping-backend.onrender.com/api/seller-follow/status`, {
       params: { sellerId: product.sellerId, userId: followUserId },
     })
     .then((res) => {
@@ -335,7 +335,7 @@ const handleSellerFollow = (e) => {
     return;
   }
   axios
-    .post(`http://localhost:5000/api/seller-follow/toggle`, {
+    .post(`https://dailyshopping-backend.onrender.com/api/seller-follow/toggle`, {
       userId: followUserId,
       sellerId: product?.sellerId,
     })
@@ -364,7 +364,7 @@ const handleSellerFollow = (e) => {
     useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/coupons");
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("❌ Error fetching coupons:", err);
@@ -421,7 +421,7 @@ useEffect(() => {
 
   const loadProduct = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/products");
       const all = Array.isArray(res.data) ? res.data : res.data.products || [];
 
       setProducts(all);
@@ -438,7 +438,7 @@ useEffect(() => {
       } else {
         // fallback: slow api call
         const apiRes = await axios.get(
-          `http://localhost:5000/api/products/slug/${title}`
+          `https://dailyshopping-backend.onrender.com/api/products/slug/${title}`
         );
         const data = apiRes.data;
 
@@ -502,7 +502,7 @@ const showMore = () => {
 
   const checkWishlist = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/wishlist", {
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/wishlist", {
         params: { userId },
       });
 

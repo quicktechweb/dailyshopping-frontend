@@ -17,7 +17,7 @@ const AddAddressBook = () => {
     }
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/auth/addresses/${userId}`
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}`
       );
       if (res.data.success) setAddresses(res.data.addresses);
     } catch (err) {
@@ -34,7 +34,7 @@ const AddAddressBook = () => {
   const handleSetDefaultShipping = async (addressId) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}/default-shipping`
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}/${addressId}/default-shipping`
       );
       fetchAddresses();
     } catch (err) {
@@ -45,7 +45,7 @@ const AddAddressBook = () => {
   const handleSetDefaultBilling = async (addressId) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}/default-billing`
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}/${addressId}/default-billing`
       );
       fetchAddresses();
     } catch (err) {

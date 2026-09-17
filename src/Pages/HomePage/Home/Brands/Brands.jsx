@@ -10,7 +10,7 @@ const Brands = () => {
   // Fetch brands from API
   const fetchBrands = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/brands");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/brands");
       const data = res.data.map((b, i) => ({
         id: b._id || i,
         name: b.brandName || "Unknown",

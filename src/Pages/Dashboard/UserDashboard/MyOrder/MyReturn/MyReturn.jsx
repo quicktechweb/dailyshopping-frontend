@@ -27,7 +27,7 @@ export default function MyReturns() {
 
     const fetchReturns = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/my-returns", {
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/my-returns", {
           params: { userId },
         });
         setReturns(res.data);

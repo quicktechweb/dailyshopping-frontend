@@ -10,7 +10,7 @@ const AboutUsAdmin = () => {
   // Fetch AboutUs Data
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/aboutus");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/aboutus");
       setData(res.data);
       setFormData(res.data);
     } catch (err) {
@@ -60,7 +60,7 @@ const AboutUsAdmin = () => {
   // Save changes
   const handleSave = async () => {
     try {
-      const res = await axios.put("http://localhost:5000/api/aboutus", formData);
+      const res = await axios.put("https://dailyshopping-backend.onrender.com/api/aboutus", formData);
       setData(res.data);
       setEditMode(false);
       alert("Saved successfully!");

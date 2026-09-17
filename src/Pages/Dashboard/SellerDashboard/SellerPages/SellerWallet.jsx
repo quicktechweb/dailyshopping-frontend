@@ -32,12 +32,12 @@ export default function SellerWallet() {
   const fetchWalletData = async () => {
     if (!seller?.sellerId) return;
     try {
-      const sellerRes = await axios.get(`http://localhost:5000/api/sellers/${seller._id}`);
+      const sellerRes = await axios.get(`https://dailyshopping-backend.onrender.com/api/sellers/${seller._id}`);
       setBalance(Number(sellerRes.data?.walletBalance || 0));
 
       const [txnRes, wdRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/wallet/seller/${seller.sellerId}/transactions`),
-        axios.get(`http://localhost:5000/api/wallet/seller/${seller.sellerId}/withdraw-requests`),
+        axios.get(`https://dailyshopping-backend.onrender.com/api/wallet/seller/${seller.sellerId}/transactions`),
+        axios.get(`https://dailyshopping-backend.onrender.com/api/wallet/seller/${seller.sellerId}/withdraw-requests`),
       ]);
 
       setTransactions(txnRes.data?.transactions || []);
@@ -83,7 +83,7 @@ export default function SellerWallet() {
 
     setSubmitting(true);
     try {
-      const { data } = await axios.post("http://localhost:5000/api/wallet/seller/withdraw-request", {
+      const { data } = await axios.post("https://dailyshopping-backend.onrender.com/api/wallet/seller/withdraw-request", {
         sellerId: seller.sellerId,
         amount: numAmount,
         method,

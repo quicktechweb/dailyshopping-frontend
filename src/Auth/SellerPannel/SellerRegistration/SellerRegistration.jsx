@@ -45,7 +45,7 @@ export default function SellerRegistration() {
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch("http://localhost:5000/upload", {
+    const res = await fetch("https://dailyshopping-backend.onrender.com/upload", {
       method: "POST",
       body: formData,
     });
@@ -88,7 +88,7 @@ export default function SellerRegistration() {
         tinCertificateImg,
       };
 
-      const res = await fetch("http://localhost:5000/api/sellers/register", {
+      const res = await fetch("https://dailyshopping-backend.onrender.com/api/sellers/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

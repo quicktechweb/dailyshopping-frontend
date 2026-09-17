@@ -35,7 +35,7 @@ const AddNewAddress = () => {
     setSaving(true);
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/auth/addresses/${userId}`,
+        `https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}`,
         form
       );
       if (res.data.success) {

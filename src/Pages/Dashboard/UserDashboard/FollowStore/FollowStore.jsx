@@ -11,7 +11,7 @@ export default function FollowStore() {
   useEffect(() => {
     if (!userId) return;
     axios
-      .get(`http://localhost:5000/api/seller-follow/my`, { params: { userId } })
+      .get(`https://dailyshopping-backend.onrender.com/api/seller-follow/my`, { params: { userId } })
       .then((res) => setStores(res.data?.data || []))
       .catch((err) => console.error("Follow list fetch error:", err));
   }, [userId]);

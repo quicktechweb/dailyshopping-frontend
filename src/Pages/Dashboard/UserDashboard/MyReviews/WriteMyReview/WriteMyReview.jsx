@@ -49,7 +49,7 @@ export default function WriteReview() {
     const loadItem = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/reviews/item/${orderId}/${itemId}`
+          `https://dailyshopping-backend.onrender.com/api/reviews/item/${orderId}/${itemId}`
         );
         setItem(res.data);
       } catch (err) {
@@ -114,7 +114,7 @@ export default function WriteReview() {
       formData.append("anonymous", anonymous);
       photos.forEach((file) => formData.append("photos", file));
 
-      await axios.post("http://localhost:5000/api/reviews", formData, {
+      await axios.post("https://dailyshopping-backend.onrender.com/api/reviews", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

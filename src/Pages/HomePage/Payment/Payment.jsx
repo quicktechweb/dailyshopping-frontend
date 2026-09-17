@@ -115,7 +115,7 @@ const displayTotal = Math.max(0, grandtotal - referralDiscount);
 
 useEffect(() => {
  
-  axios.get("http://localhost:5000/api/refferalsystem/redeem-info", {
+  axios.get("https://dailyshopping-backend.onrender.com/api/refferalsystem/redeem-info", {
     params: { userId: user?.userId, grandtotal },
   }).then((res) => { if (res.data?.success) setReferralInfo(res.data.data); })
     .catch((err) => console.error("Referral info fetch failed:", err));
@@ -178,7 +178,7 @@ if (paymentMethod === "bkash") {
   try {
     setLoading(true);
 
-    const res = await axios.post("http://localhost:5000/api/orders/bkash/create", {
+    const res = await axios.post("https://dailyshopping-backend.onrender.com/api/orders/bkash/create", {
       ...orderData,
       amount: grandtotal,
       userPhone: e.target.phone.value,
@@ -227,7 +227,7 @@ if (paymentMethod === "bkash") {
 
         // get wallet balance
         const walletRes = await axios.post(
-          "http://localhost:5000/api/auth/users/get-wallet",
+          "https://dailyshopping-backend.onrender.com/api/auth/users/get-wallet",
           { auth }
         );
 
@@ -244,7 +244,7 @@ if (paymentMethod === "bkash") {
         }
 
         const payRes = await axios.post(
-          "http://localhost:5000/api/orders/wallet-pay",
+          "https://dailyshopping-backend.onrender.com/api/orders/wallet-pay",
           {
             ...orderData,
             amount: grandtotal,
@@ -301,7 +301,7 @@ if (paymentMethod === "bkash") {
       setLoading(true);
 
       // Response discarded since we don't need it directly
-      await axios.post("http://localhost:5000/api/orders/cod", orderData);
+      await axios.post("https://dailyshopping-backend.onrender.com/api/orders/cod", orderData);
       
 
       setSuccess(true);

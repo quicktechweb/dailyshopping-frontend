@@ -19,7 +19,7 @@ export default function MyCancellations() {
     const fetchCancellations = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/my-cancellations", // ⬅️ নতুন dedicated API
+          "https://dailyshopping-backend.onrender.com/api/my-cancellations", // ⬅️ নতুন dedicated API
           { params: { userId } }
         );
         setCancellations(res.data);

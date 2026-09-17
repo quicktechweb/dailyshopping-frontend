@@ -13,7 +13,7 @@ export default function FAQ() {
     // Fetch FAQ data from backend
     const fetchFAQ = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/faq"); // update if different port/path
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/faq"); // update if different port/path
         if (res.data.success && res.data.data) {
           setFaqData(res.data.data);
         }

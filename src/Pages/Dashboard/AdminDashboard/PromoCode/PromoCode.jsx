@@ -15,7 +15,7 @@ export default function PromoManager() {
   // Load products
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products")
+      .get("https://dailyshopping-backend.onrender.com/api/products")
       .then((res) => setProducts(res.data))
       .catch(() => alert("Failed to load products"));
   }, []);
@@ -42,7 +42,7 @@ export default function PromoManager() {
 
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/products/updatepromo/category",
+        "https://dailyshopping-backend.onrender.com/api/products/updatepromo/category",
         {
           categoryName: cat,
           promoCode: data.promoCode,
@@ -67,7 +67,7 @@ export default function PromoManager() {
 
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/products/updatepromo/all",
+        "https://dailyshopping-backend.onrender.com/api/products/updatepromo/all",
         {
           allProductPromoCode: promoCode,
           allProductPromoType: promoType,

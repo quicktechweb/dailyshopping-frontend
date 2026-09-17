@@ -8,7 +8,7 @@ export default function ProductCarousel() {
   // ✅ Fetch carousel data from backend
   const fetchSlides = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/carousel");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/carousel");
       setSlides(res.data);
     } catch (error) {
       console.error("Failed to load carousel data:", error);

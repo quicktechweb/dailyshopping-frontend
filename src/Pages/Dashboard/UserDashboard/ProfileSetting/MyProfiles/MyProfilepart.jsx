@@ -32,7 +32,7 @@ const MyProfilePart = () => {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/auth/profile/${userId}`
+          `https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`
         );
         if (res.data.success) setProfile(res.data.user);
       } catch (err) {

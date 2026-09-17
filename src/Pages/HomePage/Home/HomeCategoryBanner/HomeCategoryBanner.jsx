@@ -10,7 +10,7 @@ const HomeCategoryBanner = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // mobile carousel index
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "http://localhost:5000/api/categorybanner";
+  const API_URL = "https://dailyshopping-backend.onrender.com/api/categorybanner";
 
   // ✅ Fetch banners
   const fetchBanners = async () => {

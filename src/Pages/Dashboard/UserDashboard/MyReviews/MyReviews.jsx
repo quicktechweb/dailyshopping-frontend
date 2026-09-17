@@ -20,10 +20,10 @@ const MyReviews = () => {
     const load = async () => {
       try {
         const [pendingRes, historyRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/reviews/pending", {
+          axios.get("https://dailyshopping-backend.onrender.com/api/reviews/pending", {
             params: { userId },
           }),
-          axios.get("http://localhost:5000/api/reviews/history", {
+          axios.get("https://dailyshopping-backend.onrender.com/api/reviews/history", {
             params: { userId },
           }),
         ]);

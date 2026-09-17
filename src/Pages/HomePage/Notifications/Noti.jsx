@@ -22,7 +22,7 @@ const Noti = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/notification/read/${id}`);
+      await axios.put(`https://dailyshopping-backend.onrender.com/api/notification/read/${id}`);
       setNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, read: true } : n)
       );
@@ -37,7 +37,7 @@ const Noti = () => {
       if (!userId) return;
 
       await axios.put(
-        `http://localhost:5000/api/notification/read-all/${userId}`
+        `https://dailyshopping-backend.onrender.com/api/notification/read-all/${userId}`
       );
 
       setNotifications(prev =>

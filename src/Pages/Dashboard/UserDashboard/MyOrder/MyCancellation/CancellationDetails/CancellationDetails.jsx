@@ -10,7 +10,7 @@ const CancellationDetails = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/orders/${id}`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/orders/${id}`);
         setOrder(res.data);
       } catch (err) {
         console.error(err);

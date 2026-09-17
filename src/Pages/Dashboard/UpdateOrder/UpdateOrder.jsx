@@ -32,7 +32,7 @@ const UpdateOrder = () => {
         const sellerData = JSON.parse(localStorage.getItem("seller")) || {};
         const sellerId = sellerData.sellerId;
 
-        const res = await axios.get(`http://localhost:5000/api/seller-orders/${sellerId}`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/seller-orders/${sellerId}`);
         const pendingOrders = res.data.orders.filter(order => order.status === "pending");
         setOrder(pendingOrders);
     } catch (err) {
@@ -51,7 +51,7 @@ const getFraudCheck = async (phone) => {
   if (fraudData[phone]) return; // ক্যাশ করা থাকলে আবার কল হবে না 🔥
 
   try {
-    const res = await axios.post("http://localhost:5000/api/fraudcheck", { phone });
+    const res = await axios.post("https://dailyshopping-backend.onrender.com/api/fraudcheck", { phone });
     setFraudData(prev => ({
       ...prev,
       [phone]: calculateRate(res.data.total_delivered, res.data.total_parcels)
@@ -73,7 +73,7 @@ const getFraudCheck = async (phone) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:5000/api/ordersdata/${id}`);
+                    await axios.delete(`https://dailyshopping-backend.onrender.com/api/ordersdata/${id}`);
                     setOrder(ordering.filter(order => order._id !== id));
                     Swal.fire('Deleted!', 'Order has been deleted.', 'success');
                     if (selectedOrder?._id === id) setSelectedOrder(null);

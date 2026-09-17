@@ -41,7 +41,7 @@ export default function AccountInformation() {
 
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/auth/profile/${userId}`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`);
         if (res.data.success) {
           setProfile(res.data.user);
           setDisplayName(res.data.user.displayName || "");
@@ -96,7 +96,7 @@ export default function AccountInformation() {
     setSavingProfile(true);
 
     try {
-      const res = await axios.put(`http://localhost:5000/api/auth/profile/${userId}`, {
+      const res = await axios.put(`https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`, {
         displayName,
         birthday,
         gender,
@@ -137,7 +137,7 @@ export default function AccountInformation() {
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/auth/change-password/${userId}`,
+        `https://dailyshopping-backend.onrender.com/api/auth/change-password/${userId}`,
         { currentPassword, newPassword }
       );
 

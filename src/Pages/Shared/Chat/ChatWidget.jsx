@@ -20,7 +20,7 @@ export default function ChatWidget({ sellerId, sellerName, product, onClose }) {
     if (!buyerId || !sellerId) return;
 
     axios
-      .post("http://localhost:5000/api/chat/conversations/start", {
+      .post("https://dailyshopping-backend.onrender.com/api/chat/conversations/start", {
         buyerId,
         buyerName,
         sellerId,
@@ -32,7 +32,7 @@ export default function ChatWidget({ sellerId, sellerName, product, onClose }) {
       .then(async ({ data }) => {
         setConversation(data.conversation);
         const res = await axios.get(
-          `http://localhost:5000/api/chat/messages/${data.conversation._id}`
+          `https://dailyshopping-backend.onrender.com/api/chat/messages/${data.conversation._id}`
         );
         setMessages(res.data.messages);
 

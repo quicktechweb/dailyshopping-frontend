@@ -30,7 +30,7 @@ export default function SellerReview() {
   useEffect(() => {
     if (!sellerId) return;
     axios
-      .get(`http://localhost:5000/api/seller-shop/${sellerId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/seller-shop/${sellerId}`)
       .then((res) => setShop(res.data.shop))
       .catch((err) => console.error("Seller shop overview fetch error:", err));
   }, [sellerId]);
@@ -40,7 +40,7 @@ export default function SellerReview() {
     if (!sellerId) return;
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api/seller-shop/${sellerId}/reviews`, {
+      .get(`https://dailyshopping-backend.onrender.com/api/seller-shop/${sellerId}/reviews`, {
         params: {
           rating: ratingFilter || undefined,
           sort,

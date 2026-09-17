@@ -12,7 +12,7 @@ const About = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/aboutus");
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/aboutus");
         setAboutData(res.data);
       } catch (err) {
         console.error("Failed to fetch about data:", err);

@@ -28,7 +28,7 @@ export default function SellerUiPage() {
   useEffect(() => {
     if (!sellerId) return;
     axios
-      .get(`http://localhost:5000/api/products/seller/${sellerId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/products/seller/${sellerId}`)
       .then((res) => {
         const data = res.data?.data || [];
         setProducts(data);
@@ -40,7 +40,7 @@ export default function SellerUiPage() {
   useEffect(() => {
     if (!sellerId) return;
     axios
-      .get(`http://localhost:5000/api/seller-shop/${sellerId}`, {
+      .get(`https://dailyshopping-backend.onrender.com/api/seller-shop/${sellerId}`, {
         params: { userId },
       })
       .then((res) => {
@@ -59,7 +59,7 @@ export default function SellerUiPage() {
       return;
     }
     axios
-      .post(`http://localhost:5000/api/seller-follow/toggle`, { userId, sellerId })
+      .post(`https://dailyshopping-backend.onrender.com/api/seller-follow/toggle`, { userId, sellerId })
       .then((res) => {
         setFollowing(res.data.following);
         setFollowerCount(res.data.followerCount);

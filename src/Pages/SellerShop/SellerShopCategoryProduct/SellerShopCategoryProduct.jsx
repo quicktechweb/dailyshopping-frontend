@@ -33,7 +33,7 @@ export default function SellerShopCategoryProduct() {
 
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api/products/seller/${sellerId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/products/seller/${sellerId}`)
       .then((res) => {
         const data = res.data?.data || [];
         setProducts(data);
@@ -54,7 +54,7 @@ export default function SellerShopCategoryProduct() {
   useEffect(() => {
     if (!sellerId) return;
     axios
-      .get(`http://localhost:5000/api/seller-follow/status`, {
+      .get(`https://dailyshopping-backend.onrender.com/api/seller-follow/status`, {
         params: { sellerId, userId },
       })
       .then((res) => {
@@ -70,7 +70,7 @@ export default function SellerShopCategoryProduct() {
       return;
     }
     axios
-      .post(`http://localhost:5000/api/seller-follow/toggle`, { userId, sellerId })
+      .post(`https://dailyshopping-backend.onrender.com/api/seller-follow/toggle`, { userId, sellerId })
       .then((res) => {
         setFollowing(res.data.following);
         setFollowerCount(res.data.followerCount);

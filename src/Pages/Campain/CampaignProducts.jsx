@@ -15,7 +15,7 @@ export default function CampaignProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/products/${campaignId}/products`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/products/${campaignId}/products`);
         if (res.data.success) {
           setProducts(res.data.products);
           if (res.data.products.length > 0) {
@@ -47,7 +47,7 @@ export default function CampaignProducts() {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/coupons");
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("Error fetching coupons:", err);

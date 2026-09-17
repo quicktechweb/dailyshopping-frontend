@@ -11,7 +11,7 @@ const ContactUs = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/contactus");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/contactus");
       if (res.data && res.data.data) setData(res.data.data);
     } catch (err) {
       console.error(err);

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom"; // ✅ Import Link
 
-const BASE_URL = "http://localhost:5000/api/popularcategory";
+const BASE_URL = "https://dailyshopping-backend.onrender.com/api/popularcategory";
 
 const PopularCategories = () => {
   const scrollRef = useRef(null);

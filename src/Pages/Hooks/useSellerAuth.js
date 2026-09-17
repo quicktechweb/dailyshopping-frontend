@@ -19,7 +19,7 @@ const useSellerAuth = () => {
   const sellerLogin = async (mobileNumber, password, onSuccess) => {
     setIsLoading(true);
     try {
-      const { data } = await axios.post("http://localhost:5000/api/sellers/login", {
+      const { data } = await axios.post("https://dailyshopping-backend.onrender.com/api/sellers/login", {
         mobileNumber,
         password,
       });
@@ -52,7 +52,7 @@ const useSellerAuth = () => {
   const resetPassword = async (mobileNumber, newPassword, confirmNewPassword) => {
     setIsLoading(true);
     try {
-      const { data } = await axios.post("http://localhost:5000/api/sellers/reset-password", {
+      const { data } = await axios.post("https://dailyshopping-backend.onrender.com/api/sellers/reset-password", {
         mobileNumber,
         newPassword,
         confirmNewPassword,

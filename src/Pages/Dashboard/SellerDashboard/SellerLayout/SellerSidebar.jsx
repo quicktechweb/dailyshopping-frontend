@@ -41,7 +41,7 @@ export default function SellerSidebar({ onNavigate }) {
     const fetchBalance = async () => {
       if (!seller?._id) return;
       try {
-        const res = await axios.get(`http://localhost:5000/api/sellers/${seller._id}`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/sellers/${seller._id}`);
         setBalance(Number(res.data?.walletBalance || 0));
       } catch (err) {
         console.error("Failed to fetch sidebar wallet balance:", err);

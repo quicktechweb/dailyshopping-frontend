@@ -59,7 +59,7 @@ const AllRevenuedata = () => {
   // Fetch Orders
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/orders");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/orders");
       setOrders(res.data || []);
       setRawOrders(res.data || []);
     } catch (err) {
@@ -72,7 +72,7 @@ const AllRevenuedata = () => {
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/coupons");
+      const res = await fetch("https://dailyshopping-backend.onrender.com/api/coupons");
       const data = await res.json();
       if (data.success) {
         const sorted = (data.coupons || []).sort(
@@ -92,7 +92,7 @@ const AllRevenuedata = () => {
   // Fetch Expenses
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/expenses");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/expenses");
       setExpenses(res.data || []);
       setRawExpenses(res.data || []);
     } catch (err) {

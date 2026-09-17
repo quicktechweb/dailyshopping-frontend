@@ -34,7 +34,7 @@ const MyOrders = () => {
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/my-orders", {
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/my-orders", {
           params: { userId },
         });
         setOrders(res.data);

@@ -189,19 +189,19 @@ const UserOverView = () => {
     if (!user) return;
 
     axios
-      .get("http://localhost:5000/api/my-orders", {
+      .get("https://dailyshopping-backend.onrender.com/api/my-orders", {
         params: { userAuth: user?.email || user?.phoneNumber },
       })
       .then((res) => setOrders(res.data || []));
 
     axios
       .get(
-        `http://localhost:5000/api/wallet/my-requests/${user._id}`
+        `https://dailyshopping-backend.onrender.com/api/wallet/my-requests/${user._id}`
       )
       .then((res) => setWithdraws(res.data.requests || []));
 
     axios
-      .get("http://localhost:5000/api/auth/alluser")
+      .get("https://dailyshopping-backend.onrender.com/api/auth/alluser")
       .then((res) => {
         if (res.data.success) {
           const refs = res.data.users.filter(

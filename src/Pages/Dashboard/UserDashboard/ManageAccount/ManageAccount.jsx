@@ -35,7 +35,7 @@ export default function ManageAccount() {
 
     // Profile
     axios
-      .get(`http://localhost:5000/api/auth/profile/${userId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`)
       .then((res) => {
         if (res.data.success) setProfile(res.data.user);
       })
@@ -44,7 +44,7 @@ export default function ManageAccount() {
 
     // Addresses
     axios
-      .get(`http://localhost:5000/api/auth/addresses/${userId}`)
+      .get(`https://dailyshopping-backend.onrender.com/api/auth/addresses/${userId}`)
       .then((res) => {
         if (res.data.success) setAddresses(res.data.addresses);
       })
@@ -53,7 +53,7 @@ export default function ManageAccount() {
 
     // Recent Orders
     axios
-      .get("http://localhost:5000/api/my-orders", { params: { userId } })
+      .get("https://dailyshopping-backend.onrender.com/api/my-orders", { params: { userId } })
       .then((res) => {
         setOrders(Array.isArray(res.data) ? res.data.slice(0, 3) : []);
       })

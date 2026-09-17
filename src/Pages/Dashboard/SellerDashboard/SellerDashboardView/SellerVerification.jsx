@@ -13,7 +13,7 @@ export default function SellerVerification() {
   const fetchLatest = async () => {
     if (!seller?._id) return;
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/sellers/${seller._id}`);
+      const { data } = await axios.get(`https://dailyshopping-backend.onrender.com/api/sellers/${seller._id}`);
       setCurrent(data);
       localStorage.setItem("seller", JSON.stringify(data));
       setSeller(data);
@@ -31,7 +31,7 @@ export default function SellerVerification() {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        `http://localhost:5000/api/sellers/${seller._id}/request-verification`
+        `https://dailyshopping-backend.onrender.com/api/sellers/${seller._id}/request-verification`
       );
       if (data.success) {
         Swal.fire({ icon: "success", title: "Request Sent!", text: data.message, timer: 2500, showConfirmButton: false });

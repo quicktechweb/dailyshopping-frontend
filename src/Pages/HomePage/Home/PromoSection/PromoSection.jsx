@@ -17,7 +17,7 @@ const PromoSection = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/bannerlanding/banners`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/bannerlanding/banners`);
         setBannerImages(res.data.banners || []);
       } catch (err) {
         console.error("Failed to load banners", err);

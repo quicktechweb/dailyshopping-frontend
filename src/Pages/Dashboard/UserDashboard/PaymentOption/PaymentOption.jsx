@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://dailyshopping-backend.onrender.com/api/auth";
 
 const CardIcon = ({ brand }) => {
   if (brand === "mastercard") return <FaCcMastercard className="text-red-500 text-3xl" />;

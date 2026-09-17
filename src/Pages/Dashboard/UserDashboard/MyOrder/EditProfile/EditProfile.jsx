@@ -38,7 +38,7 @@ export default function EditProfile() {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/auth/profile/${userId}`
+          `https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`
         );
         if (res.data.success) {
           const u = res.data.user;
@@ -73,7 +73,7 @@ export default function EditProfile() {
           : undefined;
 
       const res = await axios.put(
-        `http://localhost:5000/api/auth/profile/${userId}`,
+        `https://dailyshopping-backend.onrender.com/api/auth/profile/${userId}`,
         { displayName, birthday, gender }
       );
 

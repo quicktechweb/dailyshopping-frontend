@@ -14,7 +14,7 @@ const [winners, setWinners] = useState([]);
 
   const fetchBanner = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/bannersadvertis");
+      const { data } = await axios.get("https://dailyshopping-backend.onrender.com/api/bannersadvertis");
       if (data.length > 0) setBanner(data[0]);
     } catch (err) {
       console.error("Failed to fetch banner:", err);
@@ -25,7 +25,7 @@ const [winners, setWinners] = useState([]);
 
   const fetchWinners = async () => {
   try {
-    const res = await axios.get("http://localhost:5000/api/winners");
+    const res = await axios.get("https://dailyshopping-backend.onrender.com/api/winners");
     if (res.data?.winners) {
       setWinners(res.data.winners.slice(0, 10)); // latest 10
     }

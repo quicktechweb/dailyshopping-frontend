@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/categoryBannersparts";
+const API_URL = "https://dailyshopping-backend.onrender.com/api/categoryBannersparts";
 
 export default function AdminBannerManager() {
   const [banners, setBanners] = useState([]);
@@ -32,7 +32,7 @@ export default function AdminBannerManager() {
     const form = new FormData();
     form.append("image", file);
 
-    const res = await fetch("http://localhost:5000/upload", {
+    const res = await fetch("https://dailyshopping-backend.onrender.com/upload", {
       method: "POST",
       body: form,
     });
@@ -74,8 +74,8 @@ export default function AdminBannerManager() {
 
   // 🔹 Fetch categories/subcategories
   useEffect(() => {
-    axios.get("http://localhost:5000/api/categories").then((r) => setCategories(r.data));
-    axios.get("http://localhost:5000/api/subcategories").then((r) => setSubcategories(r.data));
+    axios.get("https://dailyshopping-backend.onrender.com/api/categories").then((r) => setCategories(r.data));
+    axios.get("https://dailyshopping-backend.onrender.com/api/subcategories").then((r) => setSubcategories(r.data));
   }, []);
 
   useEffect(() => {

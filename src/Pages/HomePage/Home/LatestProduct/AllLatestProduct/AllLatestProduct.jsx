@@ -57,7 +57,7 @@ const AllLatestProduct = () => {
 
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/products/productsdata",
+          "https://dailyshopping-backend.onrender.com/api/products/productsdata",
           {
             params: {
               ...(categoryName && { category: categoryName }),
@@ -110,7 +110,7 @@ const AllLatestProduct = () => {
     const fetchAvailability = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/products/availability-list"
+          "https://dailyshopping-backend.onrender.com/api/products/availability-list"
         );
         setAllAvailability(res.data);
       } catch (err) {
@@ -203,7 +203,7 @@ const AllLatestProduct = () => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/coupons");
+        const res = await axios.get("https://dailyshopping-backend.onrender.com/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error(err);

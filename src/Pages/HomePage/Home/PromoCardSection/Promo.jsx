@@ -14,7 +14,7 @@ export default function PopularCategory() {
   useEffect(() => {
     const fetchSection = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/popular/section`);
+        const res = await axios.get(`https://dailyshopping-backend.onrender.com/api/popular/section`);
         setSection(res.data.section || null);
       } catch (err) {
         console.error(err);
@@ -30,7 +30,7 @@ export default function PopularCategory() {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/products/all-categories-list`
+          `https://dailyshopping-backend.onrender.com/api/products/all-categories-list`
         );
         setCategories(res.data.categories || []);
       } catch (err) {

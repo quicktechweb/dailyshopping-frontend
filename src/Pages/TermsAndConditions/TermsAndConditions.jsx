@@ -12,7 +12,7 @@ const TermsAndConditions = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/termscondition");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/termscondition");
       if (res.data.success) {
         setData(res.data.data);
       }

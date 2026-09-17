@@ -13,7 +13,7 @@ export default function AdminBadgePanel() {
   // -----------------------------
   const fetchBadges = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/badges");
+      const res = await axios.get("https://dailyshopping-backend.onrender.com/api/admin/badges");
       setBadges(res.data.badges);
     } catch (err) {
       console.error("Failed to fetch badges:", err);
@@ -33,11 +33,11 @@ export default function AdminBadgePanel() {
     try {
       if (editId) {
         // Update existing badge
-        await axios.put(`http://localhost:5000/api/admin/badges/${editId}`, { name, minCount, maxCount });
+        await axios.put(`https://dailyshopping-backend.onrender.com/api/admin/badges/${editId}`, { name, minCount, maxCount });
         setEditId(null);
       } else {
         // Create new badge
-        await axios.post("http://localhost:5000/api/admin/badges", { name, minCount, maxCount });
+        await axios.post("https://dailyshopping-backend.onrender.com/api/admin/badges", { name, minCount, maxCount });
       }
       setName(""); setMinCount(""); setMaxCount("");
       fetchBadges(); // Refresh badges
@@ -61,7 +61,7 @@ export default function AdminBadgePanel() {
   // -----------------------------
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/badges/${id}`);
+      await axios.delete(`https://dailyshopping-backend.onrender.com/api/admin/badges/${id}`);
       fetchBadges();
     } catch (err) {
       console.error("Failed to delete badge:", err);
