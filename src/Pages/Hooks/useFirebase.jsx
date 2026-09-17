@@ -65,7 +65,7 @@ const useFirebase = () => {
 
   //       if (currentToken) {
   //         await axios.post(
-  //           "https://serverluckyshop.luckyshop.com.bd/api/notification/save-token",
+  //           "http://localhost:5000/api/notification/save-token",
   //           { userId: user._id, fcmToken: currentToken }
   //         );
   //       }
@@ -102,7 +102,7 @@ const googleSignIn = async (navigate) => {
     };
 
     const { data } = await axios.post(
-      "https://serverluckyshop.luckyshop.com.bd/api/auth/google-register",
+      "http://localhost:5000/api/auth/google-register",
       userData,
       { headers: { "Content-Type": "application/json" } }
     );
@@ -148,7 +148,7 @@ const googleSignIn = async (navigate) => {
  const loginWithPhoneAndPass = async (identifier, password, navigate, location) => {
   setIsLoading(true);
   try {
-    const { data } = await axios.post("https://serverluckyshop.luckyshop.com.bd/api/auth/login", {
+    const { data } = await axios.post("http://localhost:5000/api/auth/login", {
       identifier,   // ✅ backend will match this
       password,
     });
@@ -179,7 +179,7 @@ const googleSignIn = async (navigate) => {
 
 const loginWithPhoneAndPassadmin = async (phone, password, navigate) => {
   try {
-    const { data } = await axios.post("https://serverluckyshop.luckyshop.com.bd/api/auth/login", {
+    const { data } = await axios.post("http://localhost:5000/api/auth/login", {
       identifier: phone,
       password,
     });

@@ -14,14 +14,14 @@ const SubCategory = () => {
 
   // Fetch subcategories
   const fetchSubcategories = () => {
-    fetch("https://serverluckyshop.luckyshop.com.bd/api/subcategories")
+    fetch("http://localhost:5000/api/subcategories")
       .then((res) => res.json())
       .then((data) => setSubcategories(data));
   };
 
   // Fetch categories
   const fetchCategories = () => {
-    fetch("https://serverluckyshop.luckyshop.com.bd/api/categories")
+    fetch("http://localhost:5000/api/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data));
   };
@@ -39,7 +39,7 @@ const SubCategory = () => {
   formData.append("image", file);
 
   try {
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/upload", {
+    const res = await fetch("http://localhost:5000/upload", {
       method: "POST",
       body: formData,
     });
@@ -77,8 +77,8 @@ const SubCategory = () => {
     const newSub = { ...form, subcategoryImg };
     const method = editId ? "PUT" : "POST";
     const url = editId
-      ? `https://serverluckyshop.luckyshop.com.bd/api/subcategories/${editId}`
-      : "https://serverluckyshop.luckyshop.com.bd/api/subcategories";
+      ? `http://localhost:5000/api/subcategories/${editId}`
+      : "http://localhost:5000/api/subcategories";
 
     await fetch(url, {
       method,
@@ -94,7 +94,7 @@ const SubCategory = () => {
 
   // Delete
   const handleDelete = (id) => {
-    fetch(`https://serverluckyshop.luckyshop.com.bd/api/subcategories/${id}`, { method: "DELETE" }).then(() =>
+    fetch(`http://localhost:5000/api/subcategories/${id}`, { method: "DELETE" }).then(() =>
       fetchSubcategories()
     );
   };

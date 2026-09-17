@@ -8,7 +8,7 @@ const BulkSMSSender = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("https://serverluckyshop.luckyshop.com.bd/api/message/users").then((res) => {
+    axios.get("http://localhost:5000/api/message/users").then((res) => {
       setUsers(res.data);
     });
   }, []);
@@ -19,7 +19,7 @@ const BulkSMSSender = () => {
       return;
     }
 
-    await axios.post("https://serverluckyshop.luckyshop.com.bd/api/message/send", {
+    await axios.post("http://localhost:5000/api/message/send", {
       userIds: selectedUsers,
       message,
       type: "sms",

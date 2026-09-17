@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 
-
+html,
+body,
+#root {
+  background-color: #ffffff;
+}
 
 /* ---------------------navber design start ------------------- */
 /* bdt taka icon  */

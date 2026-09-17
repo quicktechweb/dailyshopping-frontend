@@ -61,7 +61,7 @@ const SalesReportCharts = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/orders");
+      const res = await axios.get("http://localhost:5000/api/orders");
       setOrders(res.data || []);
       setRawOrders(res.data || []);
     } catch (err) {
@@ -78,7 +78,7 @@ const SalesReportCharts = () => {
 
   const fetchCoupons = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+      const res = await axios.get("http://localhost:5000/api/coupons");
       setCoupons(res.data.coupons || []); // Make sure this is an array
     } catch (err) {
       console.error(err);
@@ -89,7 +89,7 @@ const SalesReportCharts = () => {
   // 🆕 Fetch Users for Growth Chart
   const fetchUserData = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/auth/alluser");
+      const res = await axios.get("http://localhost:5000/api/auth/alluser");
 
       let userArray = [];
       if (Array.isArray(res.data)) {
@@ -161,7 +161,7 @@ const SalesReportCharts = () => {
 
   const fetchWinners = async () => {
     try {
-      const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/coupons/winners");
+      const res = await fetch("http://localhost:5000/api/coupons/winners");
       const data = await res.json();
       if (data.success) {
         const winnerMap = {};
@@ -223,7 +223,7 @@ const SalesReportCharts = () => {
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/expenses");
+      const res = await axios.get("http://localhost:5000/api/expenses");
       setExpenses(res.data || []);
       setRawExpenses(res.data || []);
     } catch (err) {

@@ -12,7 +12,7 @@ const StockOut = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+      const res = await axios.get("http://localhost:5000/api/products");
       setProducts(res.data || []);
     } catch (err) {
       console.error(err);
@@ -21,7 +21,7 @@ const StockOut = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/orders");
+      const res = await axios.get("http://localhost:5000/api/orders");
       setOrders(res.data || []);
     } catch (err) {
       console.error(err);

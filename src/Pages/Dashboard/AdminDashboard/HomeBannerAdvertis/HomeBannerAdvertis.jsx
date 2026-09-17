@@ -15,12 +15,12 @@ export default function HomeBannerAdvertis() {
   }, []);
 
   const fetchBanner = async () => {
-    const { data } = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/bannersadvertis");
+    const { data } = await axios.get("http://localhost:5000/api/bannersadvertis");
     setBanner(data[0]);
   };
 
   const updateBanner = async (updated) => {
-    await axios.put(`https://serverluckyshop.luckyshop.com.bd/api/bannersadvertis/${banner._id}`, updated);
+    await axios.put(`http://localhost:5000/api/bannersadvertis/${banner._id}`, updated);
     fetchBanner();
   };
 
@@ -35,7 +35,7 @@ export default function HomeBannerAdvertis() {
 
   try {
     const res = await axios.post(
-      "https://serverluckyshop.luckyshop.com.bd/upload",
+      "http://localhost:5000/upload",
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },

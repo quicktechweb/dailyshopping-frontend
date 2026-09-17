@@ -13,7 +13,7 @@ const LatestProduct = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+        const res = await axios.get("http://localhost:5000/api/products");
         const fetched = Array.isArray(res.data)
           ? res.data
           : res.data.products || [];
@@ -45,7 +45,7 @@ const LatestProduct = () => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+        const res = await axios.get("http://localhost:5000/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("❌ Error fetching coupons:", err);
@@ -280,7 +280,7 @@ const LatestProduct = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
-          "https://serverluckyshop.luckyshop.com.bd/api/products"
+          "http://localhost:5000/api/products"
         );
         const data = Array.isArray(res.data)
           ? res.data
@@ -404,7 +404,7 @@ const LatestProduct = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+        const res = await axios.get("http://localhost:5000/api/products");
         const fetched = Array.isArray(res.data)
           ? res.data
           : res.data.products || [];
@@ -446,7 +446,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+        const res = await axios.get("http://localhost:5000/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("❌ Error fetching coupons:", err);

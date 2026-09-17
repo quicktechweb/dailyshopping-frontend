@@ -1,12 +1,51 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
+const stepOrder = ["requested", "approved", "picked_up", "received", "refunded"];
+const stepLabels = {
+  requested: "We have received your return request",
+  approved: "Pending Pick Up",
+  picked_up: "Your return package is on its way to our logistics facility",
+  received: "Return Package Received",
+  refunded: "Refund Completed",
+  declined: "Sorry, your refund request has been declined",
+};
 
 export default function ReturnDetails() {
-  const steps = [
-    "We have received your return request",
-    "Pending Pick Up",
-    "Your return package is on its way to our logistics facility",
-    "Return Package Received",
-    "Sorry, your refund request has been declined",
-  ];
+  const { id } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/orders/${id}`);
+        setOrder(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrder();
+  }, [id]);
+
+  if (loading) return <div className="p-10 text-center text-gray-500">Loading...</div>;
+  if (!order) return <div className="p-10 text-center text-gray-500">Return not found</div>;
+
+  const isDeclined = order.returnStatus === "declined";
+
+  // declined হলে শুধু "requested" + "declined" দেখাবে, নাহলে পুরো ৫ ধাপ
+  const steps = isDeclined
+    ? [stepLabels.requested, stepLabels.declined]
+    : stepOrder.map((s) => stepLabels[s]);
+
+  const currentIndex = isDeclined
+    ? steps.length - 1
+    : stepOrder.indexOf(order.returnStatus);
+
+  const product = order.products[0];
 
   return (
     <div className="bg-gray-100 min-h-screen p-3 md:p-6 md:-mt-16">
@@ -28,15 +67,15 @@ export default function ReturnDetails() {
         "
       >
         <div className="text-sm text-gray-700 space-y-1">
-          <div>Returned on 2024-10-17 12:33:04</div>
+          <div>Returned on {new Date(order.returnRequestedAt).toLocaleString()}</div>
           <div>
             Order{" "}
             <span className="text-blue-600">
-              #664790081026286
+              #{order._id}
             </span>
           </div>
           <div className="text-xs">
-            RA Code: RN924783234926286
+            RA Code: {order.raCode}
           </div>
         </div>
 
@@ -65,7 +104,7 @@ export default function ReturnDetails() {
               >
                 <div
                   className={`w-4 h-4 rounded-full z-10 ${
-                    index === steps.length - 1
+                    index > currentIndex
                       ? "bg-white border-2 border-green-500"
                       : "bg-green-500"
                   }`}
@@ -86,7 +125,7 @@ export default function ReturnDetails() {
               <div className="flex flex-col items-center">
                 <div
                   className={`w-3 h-3 rounded-full ${
-                    index === steps.length - 1
+                    index > currentIndex
                       ? "border-2 border-green-500"
                       : "bg-green-500"
                   }`}
@@ -113,15 +152,14 @@ export default function ReturnDetails() {
           gap-2 md:gap-4
         ">
           <span className="text-gray-500 text-xs whitespace-nowrap">
-            2024-10-17 12:33:04
+            {new Date(order.returnRequestedAt).toLocaleString()}
           </span>
           <p>
             If you have selected the pick-up option, the courier will contact
             you. If you have selected the drop-off option, please drop your
-            return product to the nearest Daraz Hub/ Daraz Shop. Please pack
-            the return product(s) securely and stick the return shipping label
-            or write the tracking number and order number on the outer side of
-            the package.
+            return product to the nearest hub. Please pack
+            the return product(s) securely and write the RA code and order
+            number on the outer side of the package.
           </p>
         </div>
       </div>
@@ -137,26 +175,31 @@ export default function ReturnDetails() {
         "
       >
         <img
-          src="https://img.drz.lazcdn.com/g/kf/Sd2de1aea6911468db60a02517c52db7bY.jpg_200x200q80.jpg_.avif"
+          src={product.img}
           alt=""
           className="w-16 h-16 object-contain"
         />
 
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-800">
-            Lotto Casual Lifestyle Shoes for Men
+            {product.title}
           </p>
           <p className="text-sm text-gray-500">
-            Reason: Item does not fit me
+            Reason: {order.returnReason}
           </p>
+          {order.returnNote && (
+            <p className="text-xs text-gray-400 mt-1">
+              Note: {order.returnNote}
+            </p>
+          )}
         </div>
 
         <div className="flex justify-between md:block text-sm">
           <div className="text-gray-800 font-medium">
-            ৳ 632
+            ৳ {product.ProductPrice}
           </div>
           <div className="text-gray-400">
-            Qty: 1
+            Qty: {product.quantity}
           </div>
         </div>
       </div>

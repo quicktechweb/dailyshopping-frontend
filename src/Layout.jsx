@@ -12,19 +12,20 @@ const Layout = () => {
   const isProductDetailsRoute = location.pathname.startsWith("/productdetails");
   const isSellerRoute = location.pathname.startsWith("/sellershop");
   const isSellerRoutes = location.pathname.startsWith("/seller-review");
-  const isCategoryMobileRoute = location.pathname.startsWith("/categorypartmobile"); // new route
+  const isCategoryMobileRoute = location.pathname.startsWith("/categorypartmobile");
+  const isSellerViewRoute = location.pathname.startsWith("/sellerview"); // NEW
 
   return (
     <div className="flex flex-col min-h-screen">
 
       {/* ================= DESKTOP NAVBAR ================= */}
       <div className="hidden sm:block">
-        {isCategoryMobileRoute ? null : <Navbar />}
+        {isCategoryMobileRoute || isSellerViewRoute ? null : <Navbar />}
       </div>
 
       {/* ================= MOBILE NAVBAR (ONLY ONE PLACE) ================= */}
       <div className="sm:hidden">
-        {isCategoryMobileRoute ? (
+        {isSellerViewRoute ? null : isCategoryMobileRoute ? (
           <CategoryNavbar />
         ) : isSellerRoute || isSellerRoutes ? (
           <SellerNavbar />
@@ -36,12 +37,12 @@ const Layout = () => {
       </div>
 
       {/* ================= MAIN ================= */}
-      <main className="flex-1 pt-[140px]">
+      <main className={isSellerViewRoute ? "flex-1" : "flex-1 pt-[140px]"}>
         <Outlet />
       </main>
 
       {/* ================= FOOTER ================= */}
-      {!isDashboardRoute && !isCategoryMobileRoute && (
+      {!isDashboardRoute && !isCategoryMobileRoute && !isSellerViewRoute && (
         <>
           {isProductDetailsRoute ? (
             <footer className="hidden sm:block">

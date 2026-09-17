@@ -8,7 +8,7 @@ export default function ProductCarousel() {
   // ✅ Fetch carousel data from backend
   const fetchSlides = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/carousel");
+      const res = await axios.get("http://localhost:5000/api/carousel");
       setSlides(res.data);
     } catch (error) {
       console.error("Failed to load carousel data:", error);

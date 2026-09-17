@@ -20,7 +20,7 @@ export default function WinnerStatics() {
   useEffect(() => {
     const fetchWinners = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons/winners");
+        const res = await axios.get("http://localhost:5000/api/coupons/winners");
         if (res.data.success) {
           setWinners(res.data.winners);
         }

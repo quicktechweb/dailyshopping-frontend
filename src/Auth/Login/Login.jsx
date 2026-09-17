@@ -74,14 +74,12 @@ export default function Login() {
               </button>
             </div>
             
-            <Link to="/dashboard">
-              <button
-              type="submit"
-              className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
-            >
-              Login
-            </button>
-            </Link>
+           <button
+  type="submit"
+  className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+>
+  Login
+</button>
           
           </form>
 

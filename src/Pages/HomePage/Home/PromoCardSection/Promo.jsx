@@ -1,236 +1,235 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import axios from "axios";
 
 export default function PopularCategory() {
-  const categories = [
-    { name: "Kategori", img: "https://luckyshop.com.bd/demo/1763027822586_nocturnal-vapor-special-edition-01-500x500.webp" },
-    { name: "Handphone & Tablet", img: "https://luckyshop.com.bd/demo/1768130995804_Phone_3.jpeg" },
-    { name: "Top-Up & Tagihan", img: "https://luckyshop.com.bd/demo/1763031343097_0679530_helmet_600-removebg-preview.png" },
-    { name: "Elektronik", img: "https://luckyshop.com.bd/demo/1768405677025_Coffee_Maker.jpg" },
-    { name: "Perawatan Hewan", img: "https://luckyshop.com.bd/demo/1768409720118_City-Gold-G-scaled.jpg" },
-    { name: "Keuangan", img: "https://luckyshop.com.bd/demo/1763034805014_Okavango-231.jpg" },
-    { name: "Komputer & Laptop", img: "https://luckyshop.com.bd/demo/1763033346400_mens-watches2-removebg-preview.png" },
-    { name: "Top-Up & Tagihan", img: "https://luckyshop.com.bd/demo/1763034781860_Borges-208_.png" },
-    { name: "Elektronik", img: "https://luckyshop.com.bd/demo/1763032870455_0704465_vision-30-liter-rice-cooker-rel-50-05-stainless-steel-single-pot-regular-red-removebg-preview.png" },
-    { name: "Perawatan Hewan", img: "https://luckyshop.com.bd/demo/1763030591702_0332253_saudi-xpress-diesel-engine-oil-sae-20w-50-api-cf4-15-ltr.jpeg" },
-    { name: "Keuangan", img: "https://luckyshop.com.bd/demo/1763030682010_1309226_tubeless-balanced-bike-for-kids-12-inch-walking-balanced-bike-2-to-4-years-baby-baby-bike-green-red-.jpeg" },
-    { name: "Komputer & Laptop", img: "https://luckyshop.com.bd/demo/1763027822586_nocturnal-vapor-special-edition-01-500x500.webp" },
-  ];
+  // 🔹 Category — এখন backend থেকে আসবে
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  /* Mobile slider logic */
-  /* ================= MOBILE AUTO SCROLL ================= */
-const mobileRef = useRef(null);
+  const [section, setSection] = useState(null);
+  const [loadingSection, setLoadingSection] = useState(true);
 
-useEffect(() => {
-  const container = mobileRef.current;
-  if (!container) return;
+  // 🔹 Section fetch
+  useEffect(() => {
+    const fetchSection = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/popular/section`);
+        setSection(res.data.section || null);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingSection(false);
+      }
+    };
+    fetchSection();
+  }, []);
 
-  let scrollAmount = 0;
-  let rafId;
+  // 🔹 Category fetch
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/products/all-categories-list`
+        );
+        setCategories(res.data.categories || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  const speed = 0.4; // 🔥 speed control (increase = faster)
+  /* Mobile auto scroll */
+  const mobileRef = useRef(null);
+  useEffect(() => {
+    const container = mobileRef.current;
+    if (!container || !categories.length) return;
 
-  const autoScroll = () => {
-    scrollAmount += speed;
-    container.scrollLeft = scrollAmount;
+    let scrollAmount = 0;
+    let rafId;
+    const speed = 0.4;
 
-    // 🔁 infinite loop
-    if (scrollAmount >= container.scrollWidth / 2) {
-      scrollAmount = 0;
-    }
-
+    const autoScroll = () => {
+      scrollAmount += speed;
+      container.scrollLeft = scrollAmount;
+      if (scrollAmount >= container.scrollWidth / 2) scrollAmount = 0;
+      rafId = requestAnimationFrame(autoScroll);
+    };
     rafId = requestAnimationFrame(autoScroll);
-  };
+    return () => cancelAnimationFrame(rafId);
+  }, [categories]);
 
-  rafId = requestAnimationFrame(autoScroll);
-
-  return () => cancelAnimationFrame(rafId);
-}, []);
-
-
-
+  /* Desktop auto scroll */
   const containerRef = useRef(null);
-  const scrollRef = useRef(0); // current scroll position
-
+  const scrollRef = useRef(0);
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !categories.length) return;
 
     let animationFrameId;
-
-    const speed = 0.5; // pixels per frame, adjust for smoothness
+    const speed = 0.5;
 
     const step = () => {
       if (!container) return;
-
       scrollRef.current += speed;
-
-      // loop scroll when reaching the end
       if (scrollRef.current > container.scrollWidth - container.clientWidth) {
         scrollRef.current = 0;
       }
-
       container.scrollLeft = scrollRef.current;
-
       animationFrameId = requestAnimationFrame(step);
     };
-
     animationFrameId = requestAnimationFrame(step);
-
     return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+  }, [categories]);
 
-  
   return (
     <div className="max-w-[1220px] mx-auto bg-white rounded-xl shadow-md p-4 md:p-6 md:mb-7 mb-32">
-
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-4">
         <h2 className="text-lg md:text-2xl font-bold md:block hidden">
-          Popular Category
+          {section?.sectionTitle || "Popular Category"}
         </h2>
 
         <div className="md:flex-1 md:flex md:justify-center md:ms-32 ms-0 md:block hidden">
-          <span className="font-bold md:text-xl mr-1">
-            Download
-          </span>
-          <a href="#" className="text-green-600 font-medium text-xl ">
-            Daily Shopping App
-          </a>
+          <span className="font-bold md:text-xl mr-1">Download</span>
+          <Link
+            to={section?.downloadHeadingLink || "/"}
+            className="text-green-600 font-medium text-xl"
+          >
+            {section?.downloadHeadingText || "Daily Shopping App"}
+          </Link>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row gap-4 -mt-10 md:mt-0">
-        {/* Left Banner */}
-        <div className="md:w-1/2 rounded-lg overflow-hidden md:block hidden">
-          <img
-            src="https://i.ibb.co.com/XrhZLR8J/Whats-App-Image-2026-01-15-at-3-11-51-PM-1.jpg"
-            alt="Promo"
-            className="w-full h-auto md:h-[180px] object-cover"
-          />
+      {/* Main Content — Dynamic */}
+      {loadingSection ? (
+        <div className="flex flex-col md:flex-row gap-4 -mt-10 md:mt-0">
+          <div className="md:w-1/2 h-[180px] rounded-lg bg-gray-100 animate-pulse md:block hidden" />
+          <div className="w-full md:w-[560px] h-[180px] rounded-xl bg-gray-100 animate-pulse hidden md:block" />
         </div>
-
-        {/* Download Card */}
-        <div className="flex flex-col w-full md:w-[560px] md:h-[180px] bg-white shadow-lg rounded-xl p-4 hidden md:block">
-          <div className="flex gap-3">
-            <div className="w-[120px] md:w-[180px]  flex items-center justify-center">
-              <img
-                src="https://i.ibb.co.com/zhnzR7d4/Playstore-Lucky.png"
-                alt="QR"
-                className="w-28 md:w-40"
-              />
+      ) : (
+        <div className="flex flex-col md:flex-row gap-4 -mt-10 md:mt-0">
+          {/* Left Banner */}
+          {section?.bannerImage && (
+            <div className="md:w-1/2 rounded-lg overflow-hidden md:block hidden">
+              <Link to={section.bannerLink || "/"}>
+                <img
+                  src={section.bannerImage}
+                  alt="Promo"
+                  className="w-full h-auto md:h-[180px] object-cover"
+                />
+              </Link>
             </div>
+          )}
 
-           <div className="flex flex-col gap-3">
-  <div>
-    <p className="text-sm font-semibold text-gray-800 mt-5">
-      Download the Daily Shopping
-    </p>
-    <p className="text-xs text-gray-500">
-      Scan the QR code to download
-    </p>
-  </div>
+          {/* Download Card */}
+          <div className="flex flex-col w-full md:w-[560px] md:h-[180px] bg-white shadow-lg rounded-xl p-4 hidden md:block">
+            <div className="flex gap-3">
+              {section?.qrImage && (
+                <div className="w-[120px] md:w-[180px] flex items-center justify-center">
+                  <img src={section.qrImage} alt="QR" className="w-28 md:w-40" />
+                </div>
+              )}
 
-  <div className="flex gap-2 mt-2">
-    <Link>
-      <img
-        src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-        alt="App Store"
-        className="h-10 md:h-12"
-      />
-    </Link>
-    <Link>
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-        alt="Google Play"
-        className="h-10 md:h-12"
-      />
-    </Link>
-  </div>
-</div>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800 mt-5">
+                    {section?.downloadTitle}
+                  </p>
+                  <p className="text-xs text-gray-500">{section?.downloadSubtitle}</p>
+                </div>
 
+                <div className="flex gap-2 mt-2">
+                  {section?.appStoreImage && (
+                    <a href={section.appStoreLink || "#"} target="_blank" rel="noreferrer">
+                      <img
+                        src={section.appStoreImage}
+                        alt="App Store"
+                        className="h-10 md:h-12"
+                      />
+                    </a>
+                  )}
+                  {section?.playStoreImage && (
+                    <a href={section.playStoreLink || "#"} target="_blank" rel="noreferrer">
+                      <img
+                        src={section.playStoreImage}
+                        alt="Google Play"
+                        className="h-10 md:h-12"
+                      />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ================= CATEGORY SECTION ================= */}
+      {/* ================= CATEGORY SECTION — Dynamic ================= */}
 
-      {/* MOBILE: Slider (3 items + arrows) */}
-  {/* MOBILE: Auto running categories */}
-
-{/* MOBILE AUTO RUNNING CATEGORY */}
-       <h3 className="mt-3 text-md font-bold block md:hidden">All Category</h3>
-<div className="md:hidden bg-white py-3">
-  {/* Horizontal scroll container */}
-  <div className="flex gap-2 px-2 overflow-x-auto scrollbar-hide">
-    {categories.map((item, i) => (
-      <div
-        key={i}
-        className="
-          flex flex-col items-center
-          min-w-[20%]  /* 5 items per row */
-          text-center
-          shrink-0
-        "
-      >
-        {/* Icon */}
-        <div
-          className="
-            w-12 h-12
-            rounded-full
-            bg-gray-100
-            flex items-center justify-center
-          "
-        >
-          <img
-            src={item.img}
-            alt={item.name}
-            className="w-7 h-7 object-contain"
-          />
-        </div>
-
-        {/* Text - split into 2 lines if needed */}
-        <span className="mt-1 text-[11px] leading-snug text-gray-700 break-words text-center">
-          {item.name.split(" & ").map((line, idx) => (
-            <span key={idx} className="block">
-              {line}
-            </span>
-          ))}
-        </span>
-      </div>
+     {loadingCategories ? (
+  <div className="mt-4 flex gap-2 overflow-hidden">
+    {[...Array(6)].map((_, i) => (
+      <div key={i} className="w-12 h-12 rounded-full bg-gray-100 animate-pulse shrink-0" />
     ))}
   </div>
-</div>
+) : (
+  <>
+    {/* MOBILE */}
+    <h3 className="mt-3 text-md font-bold block md:hidden">All Category</h3>
+    <div className="md:hidden bg-white py-3">
+      <div ref={mobileRef} className="flex gap-2 px-2 overflow-x-auto scrollbar-hide">
+        {categories.map((item, i) => (
+          <Link
+            key={i}
+            to={`/category/${encodeURIComponent(item.categoryName)}`}
+            className="flex flex-col items-center min-w-[20%] text-center shrink-0"
+          >
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+              <img
+                src={item.categoryImg}
+                alt={item.categoryName}
+                className="w-7 h-7 object-contain"
+              />
+            </div>
+            <span className="mt-1 text-[11px] leading-snug text-gray-700 break-words text-center">
+              {item.categoryName.split(" & ").map((line, idx) => (
+                <span key={idx} className="block">
+                  {line}
+                </span>
+              ))}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
 
-
-
-
-
-
-
-      {/* DESKTOP: Normal grid */}
-       <h3 className="mt-3 text-xl font-bold hidden md:block">All Category</h3>
-     
-   <div
+    {/* DESKTOP */}
+    <h3 className="mt-3 text-xl font-bold hidden md:block">All Category</h3>
+    <div
       ref={containerRef}
       className="hidden md:flex gap-3 mt-3 overflow-x-auto scrollbar-hide"
     >
       {categories.map((item, i) => (
-        <div
+        <Link
           key={i}
-          className="flex items-center  gap-2 border rounded-full px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer flex-shrink-0"
+          to={`/category/${encodeURIComponent(item.categoryName)}`}
+          className="flex items-center gap-2 border rounded-full px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer flex-shrink-0"
         >
           <img
-            src={item.img}
-            alt={item.name}
+            src={item.categoryImg}
+            alt={item.categoryName}
             className="w-5 h-5 rounded-full"
           />
-          <span>{item.name}</span>
-        </div>
+          <span>{item.categoryName}</span>
+        </Link>
       ))}
     </div>
+  </>
+)}
     </div>
   );
 }

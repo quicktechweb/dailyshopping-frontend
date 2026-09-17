@@ -18,7 +18,7 @@ export default function SupplierPayment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(`https://serverluckyshop.luckyshop.com.bd/api/suppliers/${id}/payment`, form);
+    await axios.post(`http://localhost:5000/api/suppliers/${id}/payment`, form);
     navigate("/supplier");
   };
 

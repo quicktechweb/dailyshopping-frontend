@@ -27,15 +27,18 @@ const UpdateOrder = () => {
     dateFilter ? order.createdAt.split('T')[0] === dateFilter : true
   );
 
-    const fetchOrders = async () => {
-        try {
-            const res = await axios.get('https://serverluckyshop.luckyshop.com.bd/api/orders');
-            const pendingOrders = res.data.filter(order => order.status === "pending");
-            setOrder(pendingOrders);
-        } catch (err) {
-            console.error("Error fetching orders:", err);
-        }
-    };
+  const fetchOrders = async () => {
+    try {
+        const sellerData = JSON.parse(localStorage.getItem("seller")) || {};
+        const sellerId = sellerData.sellerId;
+
+        const res = await axios.get(`http://localhost:5000/api/seller-orders/${sellerId}`);
+        const pendingOrders = res.data.orders.filter(order => order.status === "pending");
+        setOrder(pendingOrders);
+    } catch (err) {
+        console.error("Error fetching orders:", err);
+    }
+};
 
 
     const [fraudData, setFraudData] = useState({});
@@ -48,7 +51,7 @@ const getFraudCheck = async (phone) => {
   if (fraudData[phone]) return; // ক্যাশ করা থাকলে আবার কল হবে না 🔥
 
   try {
-    const res = await axios.post("https://serverluckyshop.luckyshop.com.bd/api/fraudcheck", { phone });
+    const res = await axios.post("http://localhost:5000/api/fraudcheck", { phone });
     setFraudData(prev => ({
       ...prev,
       [phone]: calculateRate(res.data.total_delivered, res.data.total_parcels)
@@ -70,7 +73,7 @@ const getFraudCheck = async (phone) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`https://serverluckyshop.luckyshop.com.bd/api/ordersdata/${id}`);
+                    await axios.delete(`http://localhost:5000/api/ordersdata/${id}`);
                     setOrder(ordering.filter(order => order._id !== id));
                     Swal.fire('Deleted!', 'Order has been deleted.', 'success');
                     if (selectedOrder?._id === id) setSelectedOrder(null);

@@ -11,7 +11,7 @@ const ShippingPolicy = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/shippingpolicy");
+      const res = await axios.get("http://localhost:5000/api/shippingpolicy");
       setData(res.data.data); // adjust if your API returns differently
     } catch (err) {
       console.error("Error fetching shipping policy:", err);

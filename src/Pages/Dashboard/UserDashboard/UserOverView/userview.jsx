@@ -189,19 +189,19 @@ const UserOverView = () => {
     if (!user) return;
 
     axios
-      .get("https://serverluckyshop.luckyshop.com.bd/api/my-orders", {
+      .get("http://localhost:5000/api/my-orders", {
         params: { userAuth: user?.email || user?.phoneNumber },
       })
       .then((res) => setOrders(res.data || []));
 
     axios
       .get(
-        `https://serverluckyshop.luckyshop.com.bd/api/wallet/my-requests/${user._id}`
+        `http://localhost:5000/api/wallet/my-requests/${user._id}`
       )
       .then((res) => setWithdraws(res.data.requests || []));
 
     axios
-      .get("https://serverluckyshop.luckyshop.com.bd/api/auth/alluser")
+      .get("http://localhost:5000/api/auth/alluser")
       .then((res) => {
         if (res.data.success) {
           const refs = res.data.users.filter(

@@ -32,7 +32,7 @@ export default function Registration() {
       return;
     }
     try {
-      const res = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/auth/send-otp`, {
+      const res = await fetch(`http://localhost:5000/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber: phone }),
@@ -51,7 +51,7 @@ export default function Registration() {
 
   const verifyOtpAndRegister = async () => {
     try {
-      const res = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/auth/verify-otp`, {
+      const res = await fetch(`http://localhost:5000/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber: phone, otp }),
@@ -63,7 +63,7 @@ export default function Registration() {
       }
 
       const myrefferalcode = `REF-${nanoid(8).toUpperCase()}`;
-      const regRes = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/auth/register`, {
+      const regRes = await fetch(`http://localhost:5000/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +108,7 @@ export default function Registration() {
 
   const handleResendOtp = async () => {
     try {
-      const res = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/auth/send-otp`, {
+      const res = await fetch(`http://localhost:5000/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber: phone }),

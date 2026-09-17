@@ -1,31 +1,125 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { FaBars, FaQrcode, FaSearch, FaShoppingCart } from "react-icons/fa";
+import { FaBars,   FaShoppingCart } from "react-icons/fa";
 import {
-  FiArrowLeft,
   FiBell,
-  FiBookmark,
   FiChevronDown,
-  FiCreditCard,
-  FiHeart,
   FiMail,
   FiMapPin,
-  FiMenu,
-  FiMessageSquare,
   FiSearch,
-  FiShare2,
   FiShoppingCart,
   FiSmartphone,
 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../Context/CartContext";
-import axios from "axios";
-import { ScanSearch } from "lucide-react";
+import useAuth from "../../Hooks/useAuth";
+
+
 
 const Navbar = () => {
 
     const [active, setActive] = useState(null);
       const [categories, setCategories] = useState([]);
         const [products, setProducts] = useState([]);
+        const { user } = useAuth();
+
+        const navigate = useNavigate();
+const [search, setSearch] = useState("");
+const [suggestions, setSuggestions] = useState([]);
+
+const slugify = (text = "") =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+// 🔍 Search suggestions
+useEffect(() => {
+  if (!search.trim()) {
+    setSuggestions([]);
+    return;
+  }
+
+  const lowerSearch = search.toLowerCase();
+  const matched = [];
+
+  products.forEach((product) => {
+    if (product.categoryName?.toLowerCase().includes(lowerSearch)) {
+      matched.push({
+        type: "Category",
+        label: product.categoryName,
+        link: `/category/${slugify(product.categoryName)}`,
+        image: product.categoryImg,
+      });
+    }
+    if (product.subcategoryName?.toLowerCase().includes(lowerSearch)) {
+      matched.push({
+        type: "Subcategory",
+        label: product.subcategoryName,
+        link: `/category/${slugify(product.categoryName)}/${slugify(product.subcategoryName)}`,
+        image: product.subcategoryImg,
+      });
+    }
+    if (product.childcategoryName?.toLowerCase().includes(lowerSearch)) {
+      matched.push({
+        type: "Childcategory",
+        label: product.childcategoryName,
+        link: `/category/${slugify(product.categoryName)}/${slugify(product.subcategoryName)}/${slugify(product.childcategoryName)}`,
+        image: product.childcategoryImg,
+      });
+    }
+    if (product.brandName?.toLowerCase().includes(lowerSearch)) {
+      matched.push({
+        type: "Brand",
+        label: product.brandName,
+        link: `/brand/${slugify(product.brandName)}`,
+        image: product.brandImg,
+      });
+    }
+    if (product.title?.toLowerCase().includes(lowerSearch)) {
+      matched.push({
+        type: "Product",
+        label: product.title,
+        link: `/product-search/${slugify(product.title)}`,
+        image: product.images?.[0] || product.childcategoryImg || "",
+      });
+    }
+  });
+
+  const unique = Array.from(new Map(matched.map((m) => [m.label, m])).values());
+  setSuggestions(unique.slice(0, 10));
+}, [search, products]);
+
+const handleSearchEnter = (e) => {
+  if (e.key !== "Enter" || !search.trim()) return;
+
+  const keyword = search.toLowerCase().trim();
+
+  const found = products.find(
+    (p) =>
+      p.childcategoryName?.toLowerCase() === keyword ||
+      p.subcategoryName?.toLowerCase() === keyword ||
+      p.categoryName?.toLowerCase() === keyword
+  );
+
+  if (found) {
+    if (found.childcategoryName?.toLowerCase() === keyword) {
+      navigate(`/category/${slugify(found.categoryName)}/${slugify(found.subcategoryName)}/${slugify(found.childcategoryName)}`);
+    } else if (found.subcategoryName?.toLowerCase() === keyword) {
+      navigate(`/category/${slugify(found.categoryName)}/${slugify(found.subcategoryName)}`);
+    } else {
+      navigate(`/category/${slugify(found.categoryName)}`);
+    }
+  } else if (products.some((p) => p.brandName?.toLowerCase().includes(keyword))) {
+    navigate(`/brand/${slugify(search)}`);
+  } else {
+    navigate(`/product-search/${slugify(search)}`);
+  }
+
+  setSuggestions([]);
+};
+const username = user?.displayName || "User";
           const timer = useRef(null);
         
               const [open, setOpen] = useState(false);
@@ -59,7 +153,7 @@ useEffect(() => {
       useEffect(() => {
           const fetchProducts = async () => {
             try {
-              const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/products");
+              const res = await fetch("http://localhost:5000/api/products");
               const data = await res.json();
               setProducts(data);
             } catch (err) {
@@ -297,16 +391,49 @@ useEffect(() => {
                     </div>
 
           {/* SEARCH BAR */}
-          <div className="flex-1">
-            <div className="flex items-center border rounded-lg px-4 py-2">
-              <FiSearch className="text-gray-400 text-lg" />
-              <input
-                type="text"
-                placeholder="Search on DailyShopping"
-                className="w-full px-3 outline-none text-sm"
-              />
+       <div className="flex-1 relative">
+  <div className="flex items-center border rounded-lg px-4 py-2">
+    <FiSearch className="text-gray-400 text-lg" />
+    <input
+      type="text"
+      placeholder="Search on DailyShopping"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      onKeyDown={handleSearchEnter}
+      className="w-full px-3 outline-none text-sm"
+    />
+  </div>
+
+  {/* Suggestions Dropdown */}
+  {suggestions.length > 0 && (
+    <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+      <ul className="max-h-72 overflow-y-auto">
+        {suggestions.map((s, idx) => (
+          <li
+            key={idx}
+            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+            onClick={() => {
+              navigate(s.link);
+              setSuggestions([]);
+            }}
+          >
+            {s.image ? (
+              <img src={s.image} alt={s.label} className="w-10 h-10 object-cover rounded-md border" />
+            ) : (
+              <div className="w-10 h-10 bg-gray-100 flex items-center justify-center rounded-md border text-gray-400 text-xs">
+                N/A
+              </div>
+            )}
+            <div className="flex-1">
+              <p className="text-gray-800 font-medium">{s.label}</p>
+              <p className="text-gray-400 text-xs">{s.type}</p>
             </div>
-          </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
 
           {/* CART */}
            {/* Cart */}
@@ -323,18 +450,32 @@ useEffect(() => {
                     </Link>
 
           {/* AUTH */}
-          <div className="flex items-center gap-3">
-           <Link to="/login">
-            <button className="px-4 py-2 text-sm font-semibold border border-[#03AC0E] text-[#03AC0E] rounded-lg hover:bg-green-50">
-              Login
-            </button></Link>
-            <Link to="/registration">
-               <button className="px-4 py-2 text-sm font-semibold bg-[#03AC0E] text-white rounded-lg hover:bg-green-700">
-              Sign Up
-            </button>
-            </Link>
-         
-          </div>
+        {/* AUTH */}
+<div className="flex flex-col items-start leading-tight">
+  {user ? (
+    <Link to="/dashboard">
+      <div className="flex flex-col items-start leading-tight">
+        <p className="text-sm font-medium text-gray-700">Welcome Back</p>
+        <span className="text-sm font-semibold text-[#03AC0E]">
+          {username}
+        </span>
+      </div>
+    </Link>
+  ) : (
+    <div className="flex items-center gap-3">
+      <Link to="/login">
+        <button className="px-4 py-2 text-sm font-semibold border border-[#03AC0E] text-[#03AC0E] rounded-lg hover:bg-green-50">
+          Login
+        </button>
+      </Link>
+      <Link to="/registration">
+        <button className="px-4 py-2 text-sm font-semibold bg-[#03AC0E] text-white rounded-lg hover:bg-green-700">
+          Sign Up
+        </button>
+      </Link>
+    </div>
+  )}
+</div>
 
           {/* LOCATION */}
           <div className="flex items-center gap-1 text-sm text-gray-600 cursor-pointer hover:text-gray-800">
@@ -353,19 +494,46 @@ useEffect(() => {
       <div className="flex items-center px-3 py-2 gap-2">
 
         {/* 🔍 Search */}
-        <div className="flex flex-1 items-center border border-gray-500 rounded-lg  overflow-hidden h-10">
-          <FiSearch className="ml-3 text-gray-400 text-lg" />
+       <div className="flex flex-1 items-center border border-gray-500 rounded-lg overflow-hidden h-10 relative">
+  <FiSearch className="ml-3 text-gray-400 text-lg" />
+  <input
+    type="text"
+    placeholder="Search For Category"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    onKeyDown={handleSearchEnter}
+    className="flex-1 px-2 text-sm outline-none"
+  />
 
-          <input
-            type="text"
-            placeholder="Search For Category"
-            className="flex-1 px-2 text-sm outline-none"
-          />
-
-          <button className=" text-black text-sm font-semibold px-4 h-full">
-            
-          </button>
-        </div>
+  {suggestions.length > 0 && (
+    <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+      <ul className="max-h-72 overflow-y-auto">
+        {suggestions.map((s, idx) => (
+          <li
+            key={idx}
+            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+            onClick={() => {
+              navigate(s.link);
+              setSuggestions([]);
+            }}
+          >
+            {s.image ? (
+              <img src={s.image} alt={s.label} className="w-10 h-10 object-cover rounded-md border" />
+            ) : (
+              <div className="w-10 h-10 bg-gray-100 flex items-center justify-center rounded-md border text-gray-400 text-xs">
+                N/A
+              </div>
+            )}
+            <div className="flex-1">
+              <p className="text-gray-800 font-medium">{s.label}</p>
+              <p className="text-gray-400 text-xs">{s.type}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
 
         {/* ✉️ 🔔 🛒 Icons */}
         <div className="flex items-center gap-3">

@@ -24,7 +24,7 @@ const UserAllData = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/auth/alluser`);
+      const res = await fetch(`http://localhost:5000/api/auth/alluser`);
       const data = await res.json();
       if (data.success) {
         setUsers(data.users);
@@ -40,7 +40,7 @@ const UserAllData = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`https://serverluckyshop.luckyshop.com.bd/api/orders`);
+      const res = await fetch(`http://localhost:5000/api/orders`);
       const data = await res.json();
       setAllOrders(data);
     } catch (err) {
@@ -85,7 +85,7 @@ const UserAllData = () => {
   setLoading(true);
   try {
     const res = await fetch(
-      `https://serverluckyshop.luckyshop.com.bd/api/auth/blockuser/${user.phoneNumber}`,
+      `http://localhost:5000/api/auth/blockuser/${user.phoneNumber}`,
       { method: "PATCH" }
     );
     const data = await res.json();
@@ -109,7 +109,7 @@ const UserAllData = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://serverluckyshop.luckyshop.com.bd/api/auth/unblockuser/${phoneNumber}`,
+        `http://localhost:5000/api/auth/unblockuser/${phoneNumber}`,
         { method: "PATCH" }
       );
       const data = await res.json();

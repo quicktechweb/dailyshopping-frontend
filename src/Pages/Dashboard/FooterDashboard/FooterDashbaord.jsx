@@ -8,7 +8,7 @@ const FooterDashboard = () => {
   // Fetch footer data
   useEffect(() => {
     axios
-      .get("https://serverluckyshop.luckyshop.com.bd/api/footer")
+      .get("http://localhost:5000/api/footer")
       .then((res) => {
         const data = res.data.footer;
 
@@ -64,7 +64,7 @@ const FooterDashboard = () => {
 
   const handleSave = () => {
     axios
-      .put(`https://serverluckyshop.luckyshop.com.bd/api/footer/${footer._id}`, footer)
+      .put(`http://localhost:5000/api/footer/${footer._id}`, footer)
       .then(() => alert("Footer updated successfully!"))
       .catch((err) => console.log(err));
   };

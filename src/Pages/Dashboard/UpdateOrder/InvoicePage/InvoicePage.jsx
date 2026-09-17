@@ -10,7 +10,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get(`https://serverluckyshop.luckyshop.com.bd/api/orders/${paymentId}`)
+      .get(`http://localhost:5000/api/orders/${paymentId}`)
       .then((res) => setOrder(res.data))
       .catch((err) => console.error(err));
   }, [paymentId]);

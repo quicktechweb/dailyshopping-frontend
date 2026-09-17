@@ -11,6 +11,7 @@ import useAuth from "../../../Hooks/useAuth";
 import ReactPixel from "react-facebook-pixel";
 import { FiMessageCircle, FiMinus, FiMoreVertical, FiPlus, FiShare2 } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
+import ChatWidget from "../../../Shared/Chat/ChatWidget";
 
 
 export default function ProductDetailsPage() {
@@ -43,6 +44,11 @@ export default function ProductDetailsPage() {
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
     const navigate = useNavigate();
+    const [chatOpen, setChatOpen] = useState(false);
+
+    const [deliveryCity, setDeliveryCity] = useState("dhaka"); // পরে user address থেকে set করবে
+
+const shippingFee = deliveryCity.toLowerCase().includes("dhaka") ? 100 : 150;
 
 
    // ✅ Toggle selection
@@ -211,6 +217,7 @@ export default function ProductDetailsPage() {
  
 
   const {user}=useAuth()
+  console.log(user?.userId)
     const [loved, setLoved] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -219,68 +226,72 @@ export default function ProductDetailsPage() {
  const email = user?.email || "";
 const phone = user?.phoneNumber || user?.phone || "";
 
-  const handleWishlist = async () => {
-    if (!user) {
-      // prompt to login
-      return Swal.fire({
-        icon: "info",
-        title: "Please sign in",
-        text: "You need to sign in to add items to your wishlist.",
-        confirmButtonText: "Sign in",
-      });
-    }
+ const handleWishlist = async () => {
+  if (!user) {
+    return Swal.fire({
+      icon: "info",
+      title: "Please sign in",
+      text: "You need to sign in to add items to your wishlist.",
+      confirmButtonText: "Sign in",
+    });
+  }
 
-    // Optimistic UI
-    const prev = loved;
-    setLoved(true);
-    setLoading(true);
+  const userId =  user?.userId;
 
-    const payload = {
-      productId: product._id || product.productid || product.productId,
-      productTitle: product.title || product.categoryName || product.brandName || "Product",
-      productPrice: product.ProductPrice ?? product.productPrice ?? product.price,
-      productImg: product.images?.[0] || product.brandImg || product.childcategoryImg || "",
-      productData: product, // optionally send whole product
-      user: {
-        name,
-        email,
-        phone,
-      },
-      addedAt: new Date().toISOString(),
-    };
+  if (!userId) {
+    return Swal.fire({
+      icon: "error",
+      title: "User ID missing",
+      text: "Could not identify your account. Please try logging in again.",
+    });
+  }
 
-    try {
-      const res = await axios.post(
-        "https://serverluckyshop.luckyshop.com.bd/api/wishlist",
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
+  const prev = loved;
+  setLoved(true);
+  setLoading(true);
 
-      setLoading(false);
-
-      if (res.status === 201 || res.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Wishlist",
-          text: "This item was added to your wishlist.",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      } else {
-        throw new Error("Unexpected response");
-      }
-    } catch (err) {
-      // rollback optimistic UI
-      setLoved(prev);
-      setLoading(false);
-      console.error("Wishlist error:", err);
-      Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: "Could not add to wishlist. Try again.",
-      });
-    }
+  const payload = {
+    userId, // ✅ এখন userId দিয়ে পাঠানো হচ্ছে
+    productId: product._id || product.productid || product.productId,
+    productTitle: product.title || product.categoryName || product.brandName || "Product",
+    productPrice: product.ProductPrice ?? product.productPrice ?? product.price,
+    productImg: product.images?.[0] || product.brandImg || product.childcategoryImg || "",
+    productData: product,
+    user: { name, email, phone },
+    addedAt: new Date().toISOString(),
   };
+
+  try {
+    const res = await axios.post(
+      "http://localhost:5000/api/wishlist",
+      payload,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    setLoading(false);
+
+    if (res.status === 201 || res.status === 200) {
+      Swal.fire({
+        icon: "success",
+        title: "Added to Wishlist",
+        text: "This item was added to your wishlist.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } else {
+      throw new Error("Unexpected response");
+    }
+  } catch (err) {
+    setLoved(prev);
+    setLoading(false);
+    console.error("Wishlist error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: "Could not add to wishlist. Try again.",
+    });
+  }
+};
 
 
  
@@ -296,10 +307,44 @@ const phone = user?.phoneNumber || user?.phone || "";
   const { id } = useParams();
   const { title } = useParams();
   const [product, setProduct] = useState(null);
+  const [sellerFollowing, setSellerFollowing] = useState(false);
+const [sellerFollowerCount, setSellerFollowerCount] = useState(0);
   const [images, setImages] = useState([]);
   // const [indexs, setIndexs] = useState(0);
   // const [startIndex, setStartIndex] = useState(0);
+useEffect(() => {
+  if (!product?.sellerId) return;
+  const followUserId = user?.uid || user?._id || user?.userId;
+  axios
+    .get(`http://localhost:5000/api/seller-follow/status`, {
+      params: { sellerId: product.sellerId, userId: followUserId },
+    })
+    .then((res) => {
+      setSellerFollowing(res.data.following);
+      setSellerFollowerCount(res.data.followerCount);
+    })
+    .catch((err) => console.error("Seller follow status fetch error:", err));
+}, [product?.sellerId, user]);
 
+const handleSellerFollow = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  const followUserId = user?.uid || user?._id || user?.userId;
+  if (!followUserId) {
+    Swal.fire("Login required", "Follow korte hole age login korun", "info");
+    return;
+  }
+  axios
+    .post(`http://localhost:5000/api/seller-follow/toggle`, {
+      userId: followUserId,
+      sellerId: product?.sellerId,
+    })
+    .then((res) => {
+      setSellerFollowing(res.data.following);
+      setSellerFollowerCount(res.data.followerCount);
+    })
+    .catch((err) => console.error("Seller follow toggle error:", err));
+};
  
     const nextImage = () => setIndexs((prev) => (prev + 1) % images.length);
     const prevImage = () =>
@@ -319,7 +364,7 @@ const phone = user?.phoneNumber || user?.phone || "";
     useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+        const res = await axios.get("http://localhost:5000/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("❌ Error fetching coupons:", err);
@@ -370,14 +415,13 @@ const phone = user?.phoneNumber || user?.phone || "";
 
    const [products, setProducts] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  // const [counts, setCounts] = useState(6);
-  // const [expandedvalue, setExpandedValue] = useState(false);
+  
 useEffect(() => {
   if (!title) return;
 
   const loadProduct = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+      const res = await axios.get("http://localhost:5000/api/products");
       const all = Array.isArray(res.data) ? res.data : res.data.products || [];
 
       setProducts(all);
@@ -394,7 +438,7 @@ useEffect(() => {
       } else {
         // fallback: slow api call
         const apiRes = await axios.get(
-          `https://serverluckyshop.luckyshop.com.bd/api/products/slug/${title}`
+          `http://localhost:5000/api/products/slug/${title}`
         );
         const data = apiRes.data;
 
@@ -453,16 +497,19 @@ const showMore = () => {
 
 
  useEffect(() => {
-  if (!product || (!email && !phone)) return;
+  const userId = user?.uid || user?._id || user?.userId;
+  if (!product || !userId) return;
 
   const checkWishlist = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/wishlist", {
-        params: { email, phone },
+      const res = await axios.get("http://localhost:5000/api/wishlist", {
+        params: { userId },
       });
 
-      const items = res?.data; // API থেকে array আসবে
-      const exists = items?.some(item => item?.productId === (product?._id || product?.productid));
+      const items = res?.data;
+      const exists = items?.some(
+        (item) => item?.productId === (product?._id || product?.productid)
+      );
 
       if (exists) setLoved(true);
     } catch (err) {
@@ -471,14 +518,14 @@ const showMore = () => {
   };
 
   checkWishlist();
-}, [product, email, phone]);
+}, [product, user]);
 
 
 
   useEffect(() => {
     if (!products.length || !product) return;
 
-    // Related products filter
+   
     const related = products.filter((p) => {
       // Exclude the current product itself
       if (p._id === product._id) return false;
@@ -499,6 +546,16 @@ const showMore = () => {
  
 
     const [reviews, setReviews] = useState([]);
+    // 🔍 Review filter states
+const [mediaOnly, setMediaOnly] = useState(false);
+const [selectedStars, setSelectedStars] = useState([]);
+
+const toggleStarFilter = (star) => {
+  setSelectedStars((prev) =>
+    prev.includes(star) ? prev.filter((s) => s !== star) : [...prev, star]
+  );
+};
+
    const [imagess, setImagess] = useState([]);
  console.log(imagess)
    // Fetch product details
@@ -543,6 +600,13 @@ const showMore = () => {
    
  
    if (!product) return null;
+
+   // 🔍 Apply filters to build the list shown in "FEATURED REVIEWS"
+const filteredReviews = reviews.filter((r) => {
+  const passesMedia = !mediaOnly || (r.photos && r.photos.length > 0);
+  const passesStar = selectedStars.length === 0 || selectedStars.includes(r.rating);
+  return passesMedia && passesStar;
+});
  
    // Calculate average rating
    const totalReviews = reviews.length;
@@ -725,35 +789,35 @@ const handleBuyNow = (product) => {
   </h1>
 
   {/* Wishlist Button */}
-  <button
-    onClick={handleWishlist}
-    disabled={loading}
-    aria-label="Add to wishlist"
-    className={`
-      flex items-center justify-center
-      p-2 md:py-1 md:px-1
-      rounded-full shadow-md -mt-2
-      text-black
-      transition
-      hover:opacity-90
-      ${loved ? "bg-red-500" : ""}
-    `}
+<button
+  onClick={handleWishlist}
+  disabled={loading}
+  aria-label="Add to wishlist"
+  className={`
+    flex items-center justify-center
+    p-2 md:py-1 md:px-1
+    rounded-full shadow-md -mt-2
+    text-black
+    transition
+    hover:opacity-90
+    ${loved ? "bg-red-500" : ""}
+  `}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill={loved ? "currentColor" : "none"}
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className="w-6 h-6 md:w-5 md:h-5"
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill={loved ? "currentColor" : "none"}
-      viewBox="0 0 24 24"
-      strokeWidth={2}
-      stroke="currentColor"
-      className="w-6 h-6 md:w-5 md:h-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 8.25c0-2.485-2.014-4.5-4.5-4.5-1.74 0-3.223 1.004-3.938 2.465a4.501 4.501 0 00-3.938-2.465c-2.486 0-4.5 2.015-4.5 4.5 0 7.22 8.438 11.69 8.438 11.69S21 15.47 21 8.25z"
-      />
-    </svg>
-  </button>
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21 8.25c0-2.485-2.014-4.5-4.5-4.5-1.74 0-3.223 1.004-3.938 2.465a4.501 4.501 0 00-3.938-2.465c-2.486 0-4.5 2.015-4.5 4.5 0 7.22 8.438 11.69 8.438 11.69S21 15.47 21 8.25z"
+    />
+  </svg>
+</button>
 </div>
 
 
@@ -1055,23 +1119,23 @@ const handleBuyNow = (product) => {
         
         {/* ICON */}
         <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-          <span className="text-base font-bold text-gray-700">A</span>
-        </div>
+  <span className="text-base font-bold text-gray-700">
+    {(product?.shopName || "S").charAt(0)}
+  </span>
+</div>
 
-        {/* INFO */}
-      <Link to="/sellershop">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1">
-            <h2 className="text-sm font-semibold text-gray-900 truncate">
-              Eiger Adventure Store Official
-            </h2>
-            <CheckCircle size={14} className="text-purple-600 shrink-0" />
-          </div>
+<Link to={`/sellershop/${product?.sellerId}`}>
+<div className="flex-1 min-w-0">
+  <div className="flex items-center gap-1">
+    <h2 className="text-sm font-semibold text-gray-900 truncate">
+      {product?.shopName || "Store"}
+    </h2>
+    <CheckCircle size={14} className="text-purple-600 shrink-0" />
+  </div>
 
-          <p className="text-[11px] text-gray-500 mt-0.5">
-            Depok City
-          </p>
-
+  <p className="text-[11px] text-gray-500 mt-0.5">
+    {product?.shopName ? "Verified Seller" : "Depok City"}
+  </p>
           {/* RATING */}
           <div className="flex items-center gap-1 mt-1 text-[11px] text-gray-600 flex-wrap">
             <Star size={11} className="text-yellow-500 fill-yellow-500" />
@@ -1538,93 +1602,150 @@ const handleBuyNow = (product) => {
     <div className="px-4 py-6 text-sm text-gray-800 leading-relaxed">
 
   {/* PRODUCT DETAILS */}
-  {activeTab === "detail" && (
-    <>
-      <div className="space-y-1 mb-4">
+ {/* PRODUCT DETAILS */}
+{activeTab === "detail" && (
+  <>
+    <div className="space-y-1 mb-4">
+      <p>
+        <span className="text-gray-500">Condition:</span>{" "}
+        <b>New</b>
+      </p>
+      <p>
+        <span className="text-gray-500">Category:</span>{" "}
+        <span className="text-green-600 font-medium">
+          {product?.categoryName || "N/A"}
+        </span>
+      </p>
+      <p>
+        <span className="text-gray-500">Subcategory:</span>{" "}
+        <span className="text-green-600 font-medium">
+          {product?.subcategoryName || "N/A"}
+        </span>
+      </p>
+      {product?.childcategoryName && (
         <p>
-          <span className="text-gray-500">Condition:</span>{" "}
-          <b>New</b>
-        </p>
-        <p>
-          <span className="text-gray-500">Unit Weight:</span>{" "}
-          800 g
-        </p>
-        <p>
-          <span className="text-gray-500">Minimum Purchase:</span>{" "}
-          1 Item
-        </p>
-        <p>
-          <span className="text-gray-500">Category:</span>{" "}
-          <span className="text-green-600 font-medium">iOS</span>
-        </p>
-        <p>
-          <span className="text-gray-500">Showcase:</span>{" "}
+          <span className="text-gray-500">Childcategory:</span>{" "}
           <span className="text-green-600 font-medium">
-            All Showcases
+            {product.childcategoryName}
           </span>
         </p>
-      </div>
-
-      <p className="mb-3">
-        iSmile is an <b>APPLE ONLINE RESELLER</b> that exclusively sells
-        <b> ORIGINAL APPLE PRODUCTS</b> with
-        <b> OFFICIAL WARRANTY</b>.
+      )}
+      <p>
+        <span className="text-gray-500">Brand:</span>{" "}
+        <span className="text-green-600 font-medium">
+          {product?.brandName || "N/A"}
+        </span>
       </p>
-
-      <p className="mb-3">
-        iSmile is a Tokopedia <b>OFFICIAL STORE</b> & a
-        <b> RECOMMENDED SELLER</b> for selected Apple products.
+      <p>
+        <span className="text-gray-500">Minimum Purchase:</span>{" "}
+        1 Item
       </p>
-
-      <p className="mb-3">
-        Corporate / Project customers are welcome.
-        <br />
-        iSmile accepts bulk orders and can issue tax invoices
-        (please confirm before transaction)...
-      </p>
-
-      <button className="text-green-600 font-medium">
-        View More
-      </button>
-    </>
-  )}
-
-  {/* ================= SELLER INFO ================= */}
-  <Link to="/sellershop">
-  <div className="border-t mt-6 pt-5 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold">
-        i
-      </div>
-
-      <div>
-        <p className="font-semibold"> Apple Store</p>
-        <div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
-          <span>⭐ 4.9 (34.1k)</span>
-          <span>⏱ ± 2 hours order processing</span>
-        </div>
-      </div>
     </div>
 
-    <button className="border border-green-600 text-green-600 px-4 py-1.5 rounded-md font-medium text-sm">
-      Follow
-    </button>
+    <p className="mb-3">
+      {product?.description || "No description available for this product."}
+    </p>
+  </>
+)}
+
+{/* SPECIFICATIONS */}
+{activeTab === "spec" && (
+  <div className="space-y-1 mb-4">
+    <p>
+      <span className="text-gray-500">Variant:</span>{" "}
+      <b>{product?.variant || "N/A"}</b>
+    </p>
+    <p>
+      <span className="text-gray-500">Available Sizes:</span>{" "}
+      <b>{product?.size?.length > 0 ? product.size.join(", ") : "N/A"}</b>
+    </p>
+    <p>
+      <span className="text-gray-500">Available Colors:</span>{" "}
+      <b>{product?.color?.length > 0 ? product.color.join(", ") : "N/A"}</b>
+    </p>
+    <p>
+      <span className="text-gray-500">Stock:</span>{" "}
+      <b>{product?.stock ?? 0}</b>
+    </p>
+    <p>
+      <span className="text-gray-500">Availability:</span>{" "}
+      <b>{product?.availability || "N/A"}</b>
+    </p>
+
+    {product?.bulletPoints?.length > 0 && (
+      <div className="mt-3">
+        <span className="text-gray-500 block mb-1">Key Features:</span>
+        <ul className="list-disc list-inside space-y-1">
+          {product.bulletPoints.map((point, index) => (
+            <li key={index}>{point}</li>
+          ))}
+        </ul>
+      </div>
+    )}
   </div>
-  </Link>
-  
+)}
+
+{/* IMPORTANT INFORMATION */}
+{activeTab === "info" && (
+  <div className="space-y-3">
+    <p>
+      {product?.metadescription || "No additional information provided for this product."}
+    </p>
+
+    <p>
+      <span className="text-gray-500">Sold by:</span>{" "}
+      <b>{product?.shopName || "N/A"}</b>
+    </p>
+
+    <p>
+      <span className="text-gray-500">Product ID:</span>{" "}
+      <b>{product?.productid || "N/A"}</b>
+    </p>
+  </div>
+)}
+
+  {/* ================= SELLER INFO ================= */}
+ <Link to={`/sellershop/${product?.sellerId}`}>
+<div className="border-t mt-6 pt-5 flex items-center justify-between">
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold">
+      {(product?.shopName || "S").charAt(0)}
+    </div>
+
+    <div>
+     <p className="font-semibold">{product?.shopName || "Store"}</p>
+<div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
+   <span>⭐ {sellerFollowerCount} Follow{sellerFollowerCount === 1 ? "" : "s"}</span>
+  <span>⏱ ± 2 hours order processing</span>
+</div>
+</div>
+</div>
+
+<button
+  onClick={handleSellerFollow}
+  className={`px-4 py-1.5 rounded-md font-medium text-sm border ${
+    sellerFollowing
+      ? "bg-gray-100 text-gray-700 border-gray-300"
+      : "border-green-600 text-green-600"
+  }`}
+>
+  {sellerFollowing ? "Following" : "Follow"}
+</button>
+</div>
+</Link>
 
   {/* ================= SHIPPING ================= */}
-  <div className="border-t mt-6 pt-5">
-    <h3 className="font-semibold mb-2">Shipping</h3>
+ <div className="border-t mt-6 pt-5">
+  <h3 className="font-semibold mb-2">Shipping</h3>
 
-    <p className="flex items-center gap-2 mb-2">
-      📍 Ships from <b>Central Dhaka  City</b>
-    </p>
+  <p className="flex items-center gap-2 mb-2">
+    📍 Ships from <b>{product?.shopName || "Store"}</b>
+  </p>
 
-    <p className="flex items-center gap-2">
-      🚚 Shipping Fee <b>BDT 7650</b>
-    </p>
-  </div>
+  <p className="flex items-center gap-2">
+    🚚 Shipping Fee <b>BDT {shippingFee}</b>
+  </p>
+</div>
 </div>
 
     </div>
@@ -1701,6 +1822,7 @@ const handleBuyNow = (product) => {
  <div className="max-w-7xl mx-auto px-4 py-10 flex gap-8 bg-white">
   
   {/* ================= LEFT FILTER ================= */}
+    {/* ================= LEFT FILTER ================= */}
   <div className="w-[280px] border rounded-lg p-4 h-fit">
     <h3 className="font-semibold mb-4 text-sm">REVIEW FILTER</h3>
 
@@ -1709,8 +1831,13 @@ const handleBuyNow = (product) => {
       <div className="flex justify-between items-center mb-3 font-semibold text-sm">
         Media <span className="text-gray-400">⌃</span>
       </div>
-      <label className="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" className="w-4 h-4 accent-green-600" />
+      <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+        <input
+          type="checkbox"
+          className="w-4 h-4 accent-green-600"
+          checked={mediaOnly}
+          onChange={(e) => setMediaOnly(e.target.checked)}
+        />
         With Photo & Video
       </label>
     </div>
@@ -1724,9 +1851,14 @@ const handleBuyNow = (product) => {
       {[5, 4, 3, 2, 1].map((star) => (
         <label
           key={star}
-          className="flex items-center gap-2 mb-2 text-sm"
+          className="flex items-center gap-2 mb-2 text-sm cursor-pointer"
         >
-          <input type="checkbox" className="w-4 h-4 accent-green-600" />
+          <input
+            type="checkbox"
+            className="w-4 h-4 accent-green-600"
+            checked={selectedStars.includes(star)}
+            onChange={() => toggleStarFilter(star)}
+          />
           <div className="flex gap-1">
             {[...Array(star)].map((_, i) => (
               <FaStar key={i} className="text-yellow-400 text-sm" />
@@ -1760,39 +1892,49 @@ const handleBuyNow = (product) => {
   </div>
 
   {/* ================= RIGHT CONTENT ================= */}
-  <div className="flex-1">
+    <div className="flex-1">
 
     {/* Photo Section */}
-    <h3 className="font-semibold mb-3 text-sm">
-      CUSTOMER PHOTOS & VIDEOS
-    </h3>
+    {filteredReviews.flatMap((r) => r.photos || []).length > 0 && (
+      <>
+        <h3 className="font-semibold mb-3 text-sm">
+          CUSTOMER PHOTOS & VIDEOS
+        </h3>
+        <div className="flex gap-3 mb-8 flex-wrap">
+          {filteredReviews
+            .flatMap((r) => r.photos || [])
+            .slice(0, 5)
+            .map((img, i) => (
+              <img
+                key={i}
+                src={img}
+                alt="review"
+                className="w-20 h-20 rounded-lg object-cover"
+              />
+            ))}
 
-    <div className="flex gap-3 mb-8">
-      {[1,2,3,4,5].map((i) => (
-        <img
-          key={i}
-          src={`https://picsum.photos/seed/${i}/80`}
-          className="w-20 h-20 rounded-lg object-cover"
-        />
-      ))}
-
-      <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-        <img
-          src="https://picsum.photos/seed/last/80"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/70 text-white flex items-center justify-center font-semibold">
-          +307
+          {filteredReviews.flatMap((r) => r.photos || []).length > 5 && (
+            <div className="relative w-20 h-20 rounded-lg overflow-hidden">
+              <img
+                src={filteredReviews.flatMap((r) => r.photos || [])[5]}
+                alt="review"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/70 text-white flex items-center justify-center font-semibold">
+                +{filteredReviews.flatMap((r) => r.photos || []).length - 5}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+      </>
+    )}
 
     {/* Header */}
     <div className="flex justify-between items-center mb-4">
       <div>
         <h3 className="font-semibold text-sm">FEATURED REVIEWS</h3>
         <p className="text-sm text-gray-500">
-          Showing 10 of 340 reviews
+          Showing {Math.min(filteredReviews.length, 10)} of {filteredReviews.length} reviews
         </p>
       </div>
 
@@ -1802,60 +1944,80 @@ const handleBuyNow = (product) => {
       </select>
     </div>
 
-    {/* ================= REVIEW ITEM ================= */}
-    <div className="border-t pt-6">
-
-      {/* Top */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          {[...Array(5)].map((_, i) => (
-            <FaStar key={i} className="text-yellow-400 text-sm" />
-          ))}
-          <span className="text-sm text-gray-500">
-            Over 1 year ago
-          </span>
-        </div>
-        <FiMoreVertical className="text-gray-500" />
-      </div>
-
-      {/* User */}
-      <div className="flex items-center gap-3 mt-3">
-        <img
-          src="https://i.pravatar.cc/40"
-          className="w-9 h-9 rounded-full"
-        />
-        <div>
-          <p className="font-semibold text-sm">MWATER</p>
-          <p className="text-xs text-gray-500">
-            Variant: 128GB - Starlight White
-          </p>
-        </div>
-      </div>
-
-      {/* Text */}
-      <p className="text-sm text-gray-800 mt-3 leading-relaxed">
-        Thank you, the item has been received in excellent condition / still sealed in original packaging. Safe and secure. Thanks!
+    {/* ================= REVIEW ITEMS ================= */}
+    {filteredReviews.length === 0 ? (
+      <p className="text-sm text-gray-500 py-10 text-center">
+        {reviews.length === 0
+          ? "No reviews yet for this product."
+          : "No reviews match the selected filters."}
       </p>
+    ) : (
+      filteredReviews.slice(0, 10).map((r) => (
+        <div key={r._id} className="border-t pt-6 pb-2">
 
-      {/* Images */}
-      <div className="flex gap-3 mt-4">
-        {[1,2,3,4].map((i) => (
-          <img
-            key={i}
-            src={`https://picsum.photos/seed/rev${i}/90`}
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-        ))}
-      </div>
+          {/* Top */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <FaStar
+                  key={i}
+                  className={`text-sm ${
+                    i <= r.rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              ))}
+              <span className="text-sm text-gray-500">
+                {formatDate(r.date)}
+              </span>
+            </div>
+            <FiMoreVertical className="text-gray-500" />
+          </div>
 
-      {/* Footer */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-        <span>👍 24 people found this helpful</span>
-        <button className="text-green-600 font-medium">
-          View Replies ⌄
-        </button>
-      </div>
-    </div>
+          {/* User */}
+          <div className="flex items-center gap-3 mt-3">
+            <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-white">
+              {(r.anonymous ? "A" : r.username || "U").charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="font-semibold text-sm">
+                {r.anonymous ? "Anonymous" : r.username || "User"}
+              </p>
+              {(r.color || r.size) && (
+                <p className="text-xs text-gray-500">
+                  Variant: {[r.color, r.size].filter(Boolean).join(" - ")}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Text */}
+          {r.comment && (
+            <p className="text-sm text-gray-800 mt-3 leading-relaxed">
+              {r.comment}
+            </p>
+          )}
+
+          {/* Images */}
+          {r.photos?.length > 0 && (
+            <div className="flex gap-3 mt-4 flex-wrap">
+              {r.photos.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt="review"
+                  className="w-20 h-20 rounded-lg object-cover"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+            <span>👍 {r.likes || 0} people found this helpful</span>
+          </div>
+        </div>
+      ))
+    )}
 
   </div>
 </div>
@@ -1880,8 +2042,10 @@ const handleBuyNow = (product) => {
 
   {/* Variant */}
   <p className="text-sm text-gray-700 mb-4">
-    128GB, Blue
-  </p>
+  {product?.variant || "Standard"}
+  {selectedSizes.length > 0 && `, ${selectedSizes.join(", ")}`}
+  {selectedColors.length > 0 && `, ${selectedColors.join(", ")}`}
+</p>
 
   {/* Quantity + Stock */}
   <div className="flex items-center mb-4">
@@ -1905,25 +2069,26 @@ const handleBuyNow = (product) => {
       </button>
     </div>
 
-    <span className="text-md text-gray-700 ms-5">
-      Stock: <b>36</b>
-    </span>
+   <span className="text-md text-gray-700 ms-5">
+  Stock: <b>{product?.stock ?? 0}</b>
+</span>
   </div>
 
   {/* Price */}
-  <div className="mb-5">
-    <p className="text-sm text-gray-400 line-through">
-      Rp15,999,000
-    </p>
-    <div className="flex justify-between">
-      <span className="text-xl font-semibold text-gray-500 mb-1">
-        Subtotal
-      </span>
-      <span className="text-2xl font-bold">
-      BDT 7650
-      </span>
-    </div>
+ <div className="mb-5">
+  <p className="text-sm text-gray-400 line-through">
+    BDT {product?.oldPrice}
+  </p>
+  <div className="flex justify-between">
+    <span className="text-xl font-semibold text-gray-500 mb-1">
+      Subtotal
+    </span>
+    <span className="text-2xl font-bold">
+      BDT {(product?.ProductPrice || 0) * qty}
+    </span>
   </div>
+</div>
+
 
   {/* Buttons */}
   <div className="space-y-3 mb-4">
@@ -1931,22 +2096,40 @@ const handleBuyNow = (product) => {
       + Add to Cart
     </button>
 
-    <button className="w-full border border-green-500 text-green-500 font-semibold py-3 rounded-lg hover:bg-green-50">
+       <button
+      onClick={() => {
+        const buyNowItem = {
+          ...product,
+          quantity: qty,
+          img: product.img || product.images?.[0] || product.productimg,
+          selectedSize: selectedSizes[0] || null,
+          selectedColor: selectedColors[0] || null,
+        };
+        localStorage.setItem("selectedCart", JSON.stringify([buyNowItem]));
+        navigate("/payment");
+      }}
+      className="w-full border border-green-500 text-green-500 font-semibold py-3 rounded-lg hover:bg-green-50"
+    >
       Buy Now
     </button>
   </div>
 
   {/* Footer actions */}
   <div className="flex items-center font-bold justify-between text-sm text-gray-700">
-    <button className="flex items-center gap-1 hover:text-green-500">
+    <button  onClick={() => setChatOpen(true)}
+     className="flex items-center gap-1 hover:text-green-500">
       <FiMessageCircle />
       Chat
     </button>
 
-    <button className="flex items-center gap-1 hover:text-green-500">
-      <FiMessageCircle />
-      Wishlist
-    </button>
+  <button
+  onClick={handleWishlist}
+  disabled={loading}
+  className={`flex items-center gap-1 hover:text-green-500 ${loved ? "text-red-500" : ""}`}
+>
+  <FiMessageCircle />
+  {loading ? "Adding..." : loved ? "Wishlisted" : "Wishlist"}
+</button>
 
     <button className="flex items-center gap-1 hover:text-green-500">
       <FiMessageCircle />
@@ -2015,7 +2198,7 @@ const handleBuyNow = (product) => {
               {/* Discount Badge */}
               <div className="absolute w-10 h-8 top-2 left-1 z-20">
                 <div className="relative bg-[#FF4D5A]  text-white font-extrabold -ms-4 text-sm px-5 py-1 rounded-r-full rounded-l-lg shadow-lg">
-                  {product.discount || 35}%
+                  {product.discount || 35}
                   <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#FF4D5A] rounded-full"></span>
                 </div>
               </div>
@@ -2051,7 +2234,7 @@ const handleBuyNow = (product) => {
                                   ৳{product.oldPrice}
                                 </p>
                                 <p className="text-red-500 text-xs">
-                                  -{product.discount}%
+                                  -{product.discount}
                                 </p>
                               </div>
             
@@ -2066,7 +2249,7 @@ const handleBuyNow = (product) => {
                   <path d="M12 2l2.9 6.6L22 9.2l-5 4.9L18.3 22 12 18.3 5.7 22 7 14.1 2 9.2l7.1-.6L12 2z" />
                 </svg>
             
-                <span className="text-gray-700 text-sm ">4.9</span> <span className="text-sm ms-3 font-medium">1rb+ terjual</span>
+                <span className="text-gray-700 text-sm ">{product.avgRating}</span> <span className="text-sm ms-3 font-medium">{product.soldCount}+ sold</span>
               </div>
             
               
@@ -2088,6 +2271,15 @@ const handleBuyNow = (product) => {
           </div>
         </div>
       </div>
+
+      {chatOpen && (
+  <ChatWidget
+    sellerId={product?.sellerId}
+    sellerName={product?.shopName}
+    product={product}
+    onClose={() => setChatOpen(false)}
+  />
+)}
 
       {/* Toggle Button */}
       {/* {counts < relatedProducts.length ? (

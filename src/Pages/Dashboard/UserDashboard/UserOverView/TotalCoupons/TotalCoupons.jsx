@@ -43,7 +43,7 @@ const TotalCoupons = () => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const { data } = await axios.get(`https://serverluckyshop.luckyshop.com.bd/api/coupons/my`, {
+        const { data } = await axios.get(`http://localhost:5000/api/coupons/my`, {
           params: { email: user?.email || "", phone: user?.phoneNumber || "" },
         });
         if (data.success) setCoupons(data.coupons);
@@ -69,7 +69,7 @@ const TotalCoupons = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const { data } = await axios.delete(`https://serverluckyshop.luckyshop.com.bd/api/coupons/${id}`);
+        const { data } = await axios.delete(`http://localhost:5000/api/coupons/${id}`);
         if (data.success) {
           setCoupons((prev) => prev.filter((c) => c._id !== id));
           Swal.fire("Deleted!", "Coupon removed successfully.", "success");

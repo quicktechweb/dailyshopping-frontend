@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { BsTruck, BsPeople, BsGlobe } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import ScrollToTop from "../../../Pages/HomePage/ScrollToTop/ScrollToTop";
-import useAuth from "../../../Pages/Hooks/useAuth";
-import ForgotPassword from "../../ForgotPassword/ForgotPassword";
+import SellerForgotPassword from "./SellerForgotPassword";
+import useSellerAuth from "../../../Pages/Hooks/useSellerAuth";
 
 export default function SellerLogin() {
   const navigate = useNavigate();
-  const { loginWithPhoneAndPass, googleSignIn } = useAuth();
+  const { sellerLogin, isLoading } = useSellerAuth();
   const [showForgotModal, setShowForgotModal] = useState(false);
 
   const [phone, setPhone] = useState("");
@@ -16,7 +17,9 @@ export default function SellerLogin() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    loginWithPhoneAndPass(phone, password, navigate);
+    if (!phone || !password) return;
+
+    sellerLogin(phone, password, () => navigate("/sellerview"));
   };
 
   return (
@@ -27,17 +30,19 @@ export default function SellerLogin() {
         {/* Left Form */}
         <div className="md:w-1/2 p-10 flex flex-col justify-center space-y-6">
           <h2 className="text-3xl font-bold text-center text-green-800">Welcome Back!</h2>
-          <p className="text-center text-green-700 text-sm">Login to access your account</p>
+          <p className="text-center text-green-700 text-sm">Login to access your seller account</p>
 
           {/* Tabs */}
           <div className="flex rounded-xl overflow-hidden border border-green-200 mb-6">
             <button
-              onClick={() => navigate("/login")}
+              type="button"
+              onClick={() => navigate("/sellerLogin")}
               className="w-1/2 py-3 font-semibold text-sm bg-green-800 text-white"
             >
               Log In
             </button>
             <button
+              type="button"
               onClick={() => navigate("/sellerRegistration")}
               className="w-1/2 py-3 font-semibold text-sm bg-green-100 text-green-800"
             >
@@ -49,7 +54,7 @@ export default function SellerLogin() {
           <form className="space-y-4" onSubmit={handleLogin}>
             <input
               type="tel"
-              placeholder="Phone Number*"
+              placeholder="Mobile Number*"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full border border-green-300 rounded-lg px-4 py-2 shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none"
@@ -73,28 +78,30 @@ export default function SellerLogin() {
                 Forgot Your Password?
               </button>
             </div>
-               
-               <Link to="/sellerview">
-               <button
+
+            <button
               type="submit"
-              className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition disabled:opacity-60"
             >
-              Login
+              {isLoading ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
-               </Link>
-            
           </form>
 
-          {/* OR Divider */}
           <div className="flex items-center my-4">
             <div className="flex-1 h-px bg-green-200"></div>
             <span className="px-2 text-green-400 font-semibold text-sm">OR</span>
             <div className="flex-1 h-px bg-green-200"></div>
           </div>
 
-          {/* Google Login */}
           <button
-            onClick={() => googleSignIn(navigate)}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-green-400 bg-white text-green-700 font-medium shadow-sm hover:shadow-md hover:bg-green-50 transition"
           >
             <FcGoogle size={22} /> Login with Google
@@ -138,9 +145,8 @@ export default function SellerLogin() {
             </div>
           </div>
 
-          {/* CTA */}
           <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
-           <h4 className="font-bold text-green-800 mb-2">Are you a seller ?</h4>
+            <h4 className="font-bold text-green-800 mb-2">Are you a seller ?</h4>
             <p className="text-green-600 text-sm mb-4">Create your account and experience the best service.</p>
             <button
               onClick={() => navigate("/sellerRegistration")}
@@ -152,8 +158,7 @@ export default function SellerLogin() {
         </div>
       </div>
 
-      {/* Forgot Password Modal */}
-      <ForgotPassword isOpen={showForgotModal} onClose={() => setShowForgotModal(false)} />
+      <SellerForgotPassword isOpen={showForgotModal} onClose={() => setShowForgotModal(false)} />
     </div>
   );
 }

@@ -17,7 +17,7 @@ const EditProjectHome = () => {
 
   // Fetch banner data
   useEffect(() => {
-    fetch(`https://serverluckyshop.luckyshop.com.bd/editProjectHome/${id}`)
+    fetch(`http://localhost:5000/editProjectHome/${id}`)
       .then((res) => res.json())
       .then((data) => setBanner(data))
       .catch((error) => console.error("Error fetching banner:", error));
@@ -76,7 +76,7 @@ const EditProjectHome = () => {
     }
 
     // Send the updated data to the server
-    fetch(`https://serverluckyshop.luckyshop.com.bd/projecthomeupdate/${id}`, {
+    fetch(`http://localhost:5000/projecthomeupdate/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedBanner),

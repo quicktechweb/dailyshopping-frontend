@@ -20,7 +20,7 @@ const SendNotification = () => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        "https://serverluckyshop.luckyshop.com.bd/api/notification/create",
+        "http://localhost:5000/api/notification/create",
         { userId: user._id, title, message }
       );
 

@@ -18,7 +18,7 @@ const ChildCategoryPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+        const res = await axios.get("http://localhost:5000/api/products");
         setAllProducts(res.data);
       } catch (err) {
         console.error("Error fetching products:", err);

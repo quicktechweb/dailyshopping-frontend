@@ -11,7 +11,7 @@ export default function GoogleTag() {
   useEffect(() => {
     const fetchPixel = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/pixel");
+        const res = await axios.get("http://localhost:5000/api/pixel");
         if (res.data && res.data.pixelId) {
           setPixelId(res.data.pixelId);
           setSavedPixelId(res.data.pixelId);
@@ -33,7 +33,7 @@ export default function GoogleTag() {
 
     setLoading(true);
     try {
-      const res = await axios.post("https://serverluckyshop.luckyshop.com.bd/api/pixel", { pixelId });
+      const res = await axios.post("http://localhost:5000/api/pixel", { pixelId });
       setSavedPixelId(res.data.pixel.pixelId); // Update savedPixelId
       setMessage("Pixel ID saved successfully!");
     } catch (err) {

@@ -15,7 +15,7 @@ export default function PromoManager() {
   // Load products
   useEffect(() => {
     axios
-      .get("https://serverluckyshop.luckyshop.com.bd/api/products")
+      .get("http://localhost:5000/api/products")
       .then((res) => setProducts(res.data))
       .catch(() => alert("Failed to load products"));
   }, []);
@@ -42,7 +42,7 @@ export default function PromoManager() {
 
     try {
       const res = await axios.put(
-        "https://serverluckyshop.luckyshop.com.bd/api/products/updatepromo/category",
+        "http://localhost:5000/api/products/updatepromo/category",
         {
           categoryName: cat,
           promoCode: data.promoCode,
@@ -67,7 +67,7 @@ export default function PromoManager() {
 
     try {
       const res = await axios.put(
-        "https://serverluckyshop.luckyshop.com.bd/api/products/updatepromo/all",
+        "http://localhost:5000/api/products/updatepromo/all",
         {
           allProductPromoCode: promoCode,
           allProductPromoType: promoType,

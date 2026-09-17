@@ -33,7 +33,7 @@ const CategoryPartMobile = () => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          "https://serverluckyshop.luckyshop.com.bd/api/products"
+          "http://localhost:5000/api/products"
         );
         const data = await res.json();
         setProducts(data);

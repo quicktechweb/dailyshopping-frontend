@@ -18,7 +18,7 @@ const TopSelling = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+        const res = await axios.get("http://localhost:5000/api/products");
         const topselling = res.data.filter((p) => p.type === "topselling");
         setProducts(topselling);
       } catch (err) {
@@ -34,7 +34,7 @@ const TopSelling = () => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+        const res = await axios.get("http://localhost:5000/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error(err);

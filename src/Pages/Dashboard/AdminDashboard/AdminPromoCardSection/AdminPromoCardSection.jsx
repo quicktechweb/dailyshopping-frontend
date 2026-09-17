@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const BASE_URL = "https://serverluckyshop.luckyshop.com.bd/api/promocardsection";
+const BASE_URL = "http://localhost:5000/api/promocardsection";
 
 // Upload to ImgBB
 
@@ -14,7 +14,7 @@ const uploadToImgBB = async (file) => {
   formData.append("image", file);
 
   try {
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/upload", {
+    const res = await fetch("http://localhost:5000/upload", {
       method: "POST",
       body: formData,
     });

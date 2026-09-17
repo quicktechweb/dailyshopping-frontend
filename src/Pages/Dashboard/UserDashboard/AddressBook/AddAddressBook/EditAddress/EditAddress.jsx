@@ -1,21 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { X } from "lucide-react";
+import axios from "axios";
+import useAuth from "../../../../../Hooks/useAuth";
 
 const EditAddress = () => {
+  const { id: addressId } = useParams(); // route: /dashboard/editaddress/:id
+  const { user } = useAuth();
+  const userId = user?.userId || "";
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
-    name: "Alex",
-    phone: "017327788318",
+    name: "",
+    phone: "",
     landmark: "",
-    province: "Dhaka",
-    city: "Dhaka - North",
-    zone: "House-45, Road-12, Block-C, Green View Residency, Banani ",
-    address: "House-45, Road-12, Block-C, Green View Residency, Banani",
+    province: "",
+    city: "",
+    zone: "",
+    address: "",
     label: "HOME",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!userId || !addressId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchAddress = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`
+        );
+        if (res.data.success) {
+          const a = res.data.address;
+          setForm({
+            name: a.name || "",
+            phone: a.phone || "",
+            landmark: a.landmark || "",
+            province: a.province || "",
+            city: a.city || "",
+            zone: a.zone || "",
+            address: a.address || "",
+            label: a.label || "HOME",
+          });
+        }
+      } catch (err) {
+        console.error("Fetch address error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAddress();
+  }, [userId, addressId]);
 
   const handleChange = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`,
+        form
+      );
+      if (res.data.success) {
+        alert("Address updated successfully");
+        navigate("/dashboard/addressbook");
+      }
+    } catch (err) {
+      console.error("Update address error:", err);
+      alert("Failed to update address");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this address?")) return;
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}`
+      );
+      if (res.data.success) {
+        alert("Address deleted successfully");
+        navigate("/dashboard/addressbook");
+      }
+    } catch (err) {
+      console.error("Delete address error:", err);
+      alert("Failed to delete address");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center bg-white md:-mt-10 py-16 text-center text-gray-500 text-sm">
+        Loading address...
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center bg-white md:-mt-10 ">
@@ -25,7 +112,7 @@ const EditAddress = () => {
           <h2 className="text-xl font-semibold text-gray-800">
             Edit My Address
           </h2>
-          <button className="text-blue-500 text-sm hover:underline">
+          <button onClick={handleDelete} className="text-blue-500 text-sm hover:underline">
             Delete
           </button>
         </div>
@@ -78,13 +165,12 @@ const EditAddress = () => {
                 <label className="block text-sm text-gray-700 mb-1">
                   {label}
                 </label>
-                <select
+                <input
+                  type="text"
                   value={form[key]}
                   onChange={e => handleChange(key, e.target.value)}
                   className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-orange-400"
-                >
-                  <option>{form[key]}</option>
-                </select>
+                />
               </div>
             ))}
 
@@ -137,11 +223,18 @@ const EditAddress = () => {
 
         {/* Actions */}
         <div className="flex justify-end gap-4 mt-10">
-          <button className="px-8 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">
+          <button
+            onClick={() => navigate("/dashboard/addressbook")}
+            className="px-8 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
+          >
             Cancel
           </button>
-          <button className="px-10 py-2 rounded bg-orange-500 text-white hover:bg-orange-600">
-            SAVE
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-10 py-2 rounded bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-60"
+          >
+            {saving ? "SAVING..." : "SAVE"}
           </button>
         </div>
       </div>

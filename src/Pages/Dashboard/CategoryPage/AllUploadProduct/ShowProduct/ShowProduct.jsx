@@ -16,7 +16,7 @@ const ShowProduct = () => {
     const [error, setError] = useState(""); 
     const [addingProduct, setAddingProduct] = useState(false);
 
-    //  const image_upload_api = `https://serverluckyshop.luckyshop.com.bd/upload`;
+    //  const image_upload_api = `http://localhost:5000/upload`;
 const [campaigns, setCampaigns] = useState([]); // All campaigns from API
   const [selectedCampaign, setSelectedCampaign] = useState(""); // Selected campaign for dropdown
   const [campaignName, setCampaignName] = useState(""); 
@@ -56,7 +56,7 @@ const uploadImage = async (file) => {
   formData.append("image", file);
 
   try {
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/upload", {
+    const res = await fetch("http://localhost:5000/upload", {
       method: "POST",
       body: formData,
     });
@@ -119,7 +119,7 @@ const handleAddCategory = async () => {
     let imgUrl = "";
     if (categoryImgFile) imgUrl = await uploadImage(categoryImgFile);
 
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/categories", {
+    const res = await fetch("http://localhost:5000/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -147,7 +147,7 @@ const handleAddSubcategory = async () => {
     let imgUrl = "";
     if (subImageFile) imgUrl = await uploadImage(subImageFile);
 
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/subcategories", {
+    const res = await fetch("http://localhost:5000/api/subcategories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -177,7 +177,7 @@ const handleAddChildcategory = async () => {
     let imgUrl = "";
     if (childImageFile) imgUrl = await uploadImage(childImageFile);
 
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/childcategories", {
+    const res = await fetch("http://localhost:5000/api/childcategories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -209,7 +209,7 @@ const handleAddBrand = async () => {
       brandImgUrl = await uploadImage(brandImgFile);
     }
 
-    const res = await fetch("https://serverluckyshop.luckyshop.com.bd/api/brands", {
+    const res = await fetch("http://localhost:5000/api/brands", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -281,10 +281,10 @@ const handleAddBrand = async () => {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
-    axios.get("https://serverluckyshop.luckyshop.com.bd/api/categories").then((r) => setCategories(r.data));
-    axios.get("https://serverluckyshop.luckyshop.com.bd/api/subcategories").then((r) => setSubcategories(r.data));
-    axios.get("https://serverluckyshop.luckyshop.com.bd/api/childcategories").then((r) => setChildcategories(r.data));
-    axios.get("https://serverluckyshop.luckyshop.com.bd/api/brands").then((r) => setBrands(r.data));
+    axios.get("http://localhost:5000/api/categories").then((r) => setCategories(r.data));
+    axios.get("http://localhost:5000/api/subcategories").then((r) => setSubcategories(r.data));
+    axios.get("http://localhost:5000/api/childcategories").then((r) => setChildcategories(r.data));
+    axios.get("http://localhost:5000/api/brands").then((r) => setBrands(r.data));
     fetchProducts();
   }, []);
 
@@ -326,7 +326,7 @@ const handleAddBrand = async () => {
 
 
   const fetchProducts = async () => {
-    const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+    const res = await axios.get("http://localhost:5000/api/products");
     setProducts(res.data);
   };
 
@@ -367,7 +367,7 @@ const handleAddBrand = async () => {
         const formData = new FormData();
         formData.append("image", file);
 
-        const res = await axios.post("https://serverluckyshop.luckyshop.com.bd/upload", formData, {
+        const res = await axios.post("http://localhost:5000/upload", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -388,12 +388,12 @@ const handleAddBrand = async () => {
 
     if (editingProduct) {
       await axios.put(
-        `https://serverluckyshop.luckyshop.com.bd/api/products/${editingProduct._id}`,
+        `http://localhost:5000/api/products/${editingProduct._id}`,
         productData
       );
       setEditingProduct(null);
     } else {
-      await axios.post("https://serverluckyshop.luckyshop.com.bd/api/products", productData);
+      await axios.post("http://localhost:5000/api/products", productData);
     }
 
     setForm(emptyForm);
@@ -454,7 +454,7 @@ const handleAddBrand = async () => {
   useEffect(() => {
   const fetchCampaigns = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/campaigns");
+      const res = await axios.get("http://localhost:5000/api/campaigns");
       setCampaigns(res.data); // populate campaigns state
     } catch (err) {
       console.error("Error fetching campaigns:", err);
@@ -467,7 +467,7 @@ const handleAddBrand = async () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Delete this product?")) {
-      await axios.delete(`https://serverluckyshop.luckyshop.com.bd/api/products/${id}`);
+      await axios.delete(`http://localhost:5000/api/products/${id}`);
       fetchProducts();
     }
   };

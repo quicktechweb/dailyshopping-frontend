@@ -1,6 +1,58 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import useAuth from "../../../../Hooks/useAuth";
 
 const AddAddressBook = () => {
+  const { user } = useAuth();
+  const userId = user?.userId || "";
+
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAddresses = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/auth/addresses/${userId}`
+      );
+      if (res.data.success) setAddresses(res.data.addresses);
+    } catch (err) {
+      console.error("Fetch addresses error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [userId]);
+
+  const handleSetDefaultShipping = async (addressId) => {
+    try {
+      await axios.patch(
+        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}/default-shipping`
+      );
+      fetchAddresses();
+    } catch (err) {
+      console.error("Set default shipping error:", err);
+    }
+  };
+
+  const handleSetDefaultBilling = async (addressId) => {
+    try {
+      await axios.patch(
+        `http://localhost:5000/api/auth/addresses/${userId}/${addressId}/default-billing`
+      );
+      fetchAddresses();
+    } catch (err) {
+      console.error("Set default billing error:", err);
+    }
+  };
+
   return (
     <div className="md:-mt-10 -mt-8">
       <div className="max-w-6xl mx-auto px-4 md:px-6">
@@ -34,61 +86,90 @@ const AddAddressBook = () => {
             <div></div>
           </div>
 
-          {/* ROW */}
-          <div
-            className="
-              border-b
-              px-4 py-4
-              md:px-6 md:py-6
-              md:grid md:grid-cols-6
-              text-sm text-gray-800
-              space-y-2 md:space-y-0
-            "
-          >
-            {/* NAME */}
-            <div className="md:block font-medium">
-              Rezwan
+          {/* LOADING */}
+          {loading && (
+            <div className="py-16 text-center text-gray-500 text-sm">
+              Loading addresses...
             </div>
+          )}
 
-            {/* ADDRESS */}
-            <div className="md:col-span-2">
-              <span className="inline-block bg-orange-500 text-white text-xs px-2 py-0.5 rounded mr-2 mb-1">
-                HOME
-              </span>
-              <p className="inline md:block">
-                House-45, Road-12, Block-C, Green View Residency, Banani
-                House-45, Road-12, Block-C, Green View Residency, Banani
-              </p>
+          {/* EMPTY */}
+          {!loading && addresses.length === 0 && (
+            <div className="py-16 text-center text-gray-500 text-sm">
+              No address found
             </div>
+          )}
 
-            {/* POSTCODE */}
-            <div className="text-gray-600">
-             Dhaka - Dhaka - North - Banani
+          {/* ROWS */}
+          {!loading && addresses.map((addr) => (
+            <div
+              key={addr._id}
+              className="
+                border-b
+                px-4 py-4
+                md:px-6 md:py-6
+                md:grid md:grid-cols-6
+                text-sm text-gray-800
+                space-y-2 md:space-y-0
+              "
+            >
+              {/* NAME */}
+              <div className="md:block font-medium">
+                {addr.name}
+              </div>
 
+              {/* ADDRESS */}
+              <div className="md:col-span-2">
+                <span className="inline-block bg-orange-500 text-white text-xs px-2 py-0.5 rounded mr-2 mb-1">
+                  {addr.label}
+                </span>
+                <p className="inline md:block">
+                  {addr.address}
+                </p>
+              </div>
+
+              {/* POSTCODE / area */}
+              <div className="text-gray-600">
+                {[addr.province, addr.city, addr.zone].filter(Boolean).join(" - ")}
+              </div>
+
+              {/* PHONE */}
+              <div className="text-gray-600">
+                (+880) {addr.phone}
+              </div>
+
+              {/* ACTION */}
+              <div className="md:text-right pt-2 md:pt-0">
+                {addr.isDefaultShipping ? (
+                  <p className="text-xs text-gray-500">Default Shipping Address</p>
+                ) : (
+                  <p
+                    onClick={() => handleSetDefaultShipping(addr._id)}
+                    className="text-xs text-blue-500 cursor-pointer"
+                  >
+                    Set as Default Shipping
+                  </p>
+                )}
+                {addr.isDefaultBilling ? (
+                  <p className="text-xs text-gray-500 mb-2">Default Billing Address</p>
+                ) : (
+                  <p
+                    onClick={() => handleSetDefaultBilling(addr._id)}
+                    className="text-xs text-blue-500 cursor-pointer mb-2"
+                  >
+                    Set as Default Billing
+                  </p>
+                )}
+
+                <Link
+                  to={`/dashboard/editaddress/${addr._id}`}
+                  className="text-blue-500 text-sm font-medium"
+                >
+                  EDIT
+                </Link>
+              </div>
             </div>
-
-            {/* PHONE */}
-            <div className="text-gray-600">
-              (+880) 01799399918
-            </div>
-
-            {/* ACTION */}
-            <div className="md:text-right pt-2 md:pt-0">
-              <p className="text-xs text-gray-500">
-                Default Shipping Address
-              </p>
-              <p className="text-xs text-gray-500 mb-2">
-                Default Billing Address
-              </p>
-
-              <Link
-                to="/dashboard/editaddress"
-                className="text-blue-500 text-sm font-medium"
-              >
-                EDIT
-              </Link>
-            </div>
-          </div>
+          ))}
 
           {/* ADD BUTTON */}
           <div className="flex justify-center md:justify-end p-4 md:p-6">

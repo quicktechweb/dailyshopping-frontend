@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://serverluckyshop.luckyshop.com.bd/api"; // Replace with your backend URL
+const API_BASE = "http://localhost:5000/api"; // Replace with your backend URL
 
 // Fetch all suppliers
 export const fetchSuppliers = async () => {

@@ -7,7 +7,7 @@ export default function CategoryWiseDiscount() {
 
   // Fetch All Products
   const fetchProducts = async () => {
-    const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/products");
+    const res = await axios.get("http://localhost:5000/api/products");
     setProducts(res.data);
   };
 
@@ -34,7 +34,7 @@ export default function CategoryWiseDiscount() {
     }
 
     try {
-      await axios.put("https://serverluckyshop.luckyshop.com.bd/api/products/updatediscount/category-discount", {
+      await axios.put("http://localhost:5000/api/products/updatediscount/category-discount", {
         categoryName,
         discount: discountValue,
       });

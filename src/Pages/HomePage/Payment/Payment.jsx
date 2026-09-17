@@ -21,6 +21,10 @@ const [discountAmount, setDiscountAmount] = useState(0);
   const [error, setError] = useState("");
 const [users, setUsers] = useState(null); // local state to track wallet
   const { user, setUser } = useAuth();
+  const [useReferralCoins, setUseReferralCoins] = useState(false);
+const [referralInfo, setReferralInfo] = useState({
+  availablePoints: 0, takaPerPoint: 0, redeemableAmount: 0,
+});
   // const { notifications, setNotifications } = useNotifications();
   const useremail=user?.email
   const userphone=user?.phoneNumber
@@ -106,7 +110,18 @@ const totalQuantity = selectedItems.reduce(
   0
 );
 
+const referralDiscount = useReferralCoins ? referralInfo.redeemableAmount : 0;
+const displayTotal = Math.max(0, grandtotal - referralDiscount);
 
+useEffect(() => {
+ 
+  axios.get("http://localhost:5000/api/refferalsystem/redeem-info", {
+    params: { userId: user?.userId, grandtotal },
+  }).then((res) => { if (res.data?.success) setReferralInfo(res.data.data); })
+    .catch((err) => console.error("Referral info fetch failed:", err));
+}, [user, grandtotal]);
+
+console.log(user?.userId)
   const handleSubmit = async (e) => {
     e.preventDefault();
      if (!shippingOption) {
@@ -126,7 +141,10 @@ const totalQuantity = selectedItems.reduce(
         phone: e.target.phone.value,
         address: e.target.address.value,
       },
-      products: selectedItems,
+    products: selectedItems.map((item) => ({
+        ...item,
+        productId: item.productId || item._id, // ⬅️ NEW: link back to the Product doc for reviews
+      })),
       totals: {
         quantity: totalQuantity,
         subtotal: itemsTotal,
@@ -134,6 +152,11 @@ const totalQuantity = selectedItems.reduce(
         grandtotal,
       },
       userAuth: user?.email || user?.phoneNumber,
+      userId: user?.userId || "",
+      sellerId: selectedItems[0]?.sellerId || "",        // ⬅️ NEW
+      mobileNumber: selectedItems[0]?.mobileNumber || "", // ⬅️ NEW
+      shopName: selectedItems[0]?.shopName || "", 
+      useReferralCoins,
     };
 
      // ✅ Pixel Tracking on submit
@@ -155,7 +178,7 @@ if (paymentMethod === "bkash") {
   try {
     setLoading(true);
 
-    const res = await axios.post("https://serverluckyshop.luckyshop.com.bd/api/orders/bkash/create", {
+    const res = await axios.post("http://localhost:5000/api/orders/bkash/create", {
       ...orderData,
       amount: grandtotal,
       userPhone: e.target.phone.value,
@@ -204,13 +227,13 @@ if (paymentMethod === "bkash") {
 
         // get wallet balance
         const walletRes = await axios.post(
-          "https://serverluckyshop.luckyshop.com.bd/api/auth/users/get-wallet",
+          "http://localhost:5000/api/auth/users/get-wallet",
           { auth }
         );
 
         const walletBalance = walletRes.data.walletBalance;
 
-        if (walletBalance < grandtotal) {
+       if (walletBalance < displayTotal) {
           Swal.fire({
             icon: "error",
             title: "Insufficient Wallet Balance",
@@ -221,7 +244,7 @@ if (paymentMethod === "bkash") {
         }
 
         const payRes = await axios.post(
-          "https://serverluckyshop.luckyshop.com.bd/api/orders/wallet-pay",
+          "http://localhost:5000/api/orders/wallet-pay",
           {
             ...orderData,
             amount: grandtotal,
@@ -278,7 +301,7 @@ if (paymentMethod === "bkash") {
       setLoading(true);
 
       // Response discarded since we don't need it directly
-      await axios.post("https://serverluckyshop.luckyshop.com.bd/api/orders/cod", orderData);
+      await axios.post("http://localhost:5000/api/orders/cod", orderData);
       
 
       setSuccess(true);
@@ -513,11 +536,11 @@ const handleApplyPromo = () => {
 </label>
 
             </div>
-            {/* <div className="flex gap-4 mt-6">
+            <div className="flex gap-4 mt-6">
               <button type="submit" disabled={loading || selectedItems.length === 0} className={`${loading || selectedItems.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"} text-white px-8 py-3 rounded-full font-semibold transition`}>
                 {loading ? "Processing..." : "Confirm Order"}
               </button>
-            </div> */}
+            </div>
           </div>
 
 
@@ -562,7 +585,7 @@ const handleApplyPromo = () => {
 
 
           {/* end promo code  */}
-            <h2 className="text-xl font-bold text-gray-800 mb-6 mt-2">Order Summary</h2>
+                       <h2 className="text-xl font-bold text-gray-800 mb-6 mt-2">Order Summary</h2>
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between"><span>Total Quantity:</span> <span>{totalQuantity}</span></div>
               <div className="flex justify-between"><span>Subtotal:</span> <span>{itemsTotal.toFixed(2)} Taka</span></div>
@@ -583,19 +606,48 @@ const handleApplyPromo = () => {
   <span>{subtotalAfterDiscount.toFixed(2)} Taka</span>
 </div>
 
-             
+              {/* 🪙 Coins toggle */}
+              <div className="flex justify-between items-center py-2 border-t border-gray-100 mt-1">
+                <div>
+                  <span className="text-gray-800 font-medium">🪙 Coins</span>
+                  <span className="text-gray-400 text-xs ml-1">({referralInfo.availablePoints} coins applied)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-orange-500 text-sm font-medium">Redeem ৳{referralInfo.redeemableAmount}</span>
+                  <button
+                    type="button"
+                    onClick={() => setUseReferralCoins((prev) => !prev)}
+                    disabled={referralInfo.redeemableAmount <= 0}
+                    className={`w-11 h-6 rounded-full relative transition-colors ${
+                      useReferralCoins ? "bg-orange-500" : "bg-gray-300"
+                    } ${referralInfo.redeemableAmount <= 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      useReferralCoins ? "translate-x-5" : ""
+                    }`} />
+                  </button>
+                </div>
+              </div>
+
+              {useReferralCoins && referralDiscount > 0 && (
+                <div className="flex justify-between text-orange-600 text-sm font-medium">
+                  <span>Coins Discount:</span>
+                  <span>- ৳{referralDiscount.toFixed(2)}</span>
+                </div>
+              )}
+
               <hr className="border-gray-200 my-2" />
-               <div className="flex justify-between items-center pt-2">
-      <span className="text-gray-600 font-medium text-sm">Shipping cost</span>
-      <span className="bg-gradient-to-r from-green-200 to-green-400 text-green-900 font-bold px-3 py-1.5 rounded-full text-sm flex items-center gap-1 shadow-inner">
-        <span className="text-xs">৳</span>
-        {shipping.toLocaleString()}
-      </span>
-    </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-gray-600 font-medium text-sm">Shipping cost</span>
+                <span className="bg-gradient-to-r from-green-200 to-green-400 text-green-900 font-bold px-3 py-1.5 rounded-full text-sm flex items-center gap-1 shadow-inner">
+                  <span className="text-xs">৳</span>
+                  {shipping.toLocaleString()}
+                </span>
+              </div>
               <div className="flex justify-between items-center font-bold text-lg mt-2">
                 <span>Total</span>
                 <span className="bg-red-100 text-red-700 font-bold px-3 py-1.5 rounded-full text-sm flex items-center gap-1">
-                  <span className="text-xs">৳</span>{grandtotal.toLocaleString()}
+                  <span className="text-xs">৳</span>{displayTotal.toLocaleString()}
                 </span>
               </div>
             </div>

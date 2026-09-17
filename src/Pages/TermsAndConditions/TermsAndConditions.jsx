@@ -12,7 +12,7 @@ const TermsAndConditions = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/termscondition");
+      const res = await axios.get("http://localhost:5000/api/termscondition");
       if (res.data.success) {
         setData(res.data.data);
       }

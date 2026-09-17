@@ -376,7 +376,7 @@ export default function ProductDetailsPage() {
     useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const res = await axios.get("https://serverluckyshop.luckyshop.com.bd/api/coupons");
+        const res = await axios.get("http://localhost:5000/api/coupons");
         if (res.data.success) setCouponData(res.data.coupons);
       } catch (err) {
         console.error("❌ Error fetching coupons:", err);
@@ -429,7 +429,7 @@ export default function ProductDetailsPage() {
      if (!id) return;
      const fetchProduct = async () => {
        try {
-         const res = await axios.get(`https://serverluckyshop.luckyshop.com.bd/api/products/${id}`);
+         const res = await axios.get(`http://localhost:5000/api/products/${id}`);
          setProduct(res.data);
          setReviews(res.data.reviews || []);
          setImages(res.data.images || []);

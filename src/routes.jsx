@@ -155,6 +155,20 @@ import Settings from "./Pages/Dashboard/UserDashboard/Settings/Settings";
 import Policy from "./Pages/Dashboard/UserDashboard/Policy/Policy";
 import Feedback from "./Pages/Dashboard/UserDashboard/Feedback/Feedback";
 import Message from "./Pages/Dashboard/UserDashboard/Message/Message";
+import SellerLayout from "./Pages/Dashboard/SellerDashboard/SellerLayout/SellerLayout";
+import SellerProducts from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerProducts";
+import SellerOrders from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerOrders";
+import SellerPurchase from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerPurchase";
+import SellerMessages from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerMessages";
+import SellerWallet from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerWallet";
+import SellerLedger from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerLedger";
+import SellerSettings from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerSettings";
+import SellerUploadProducts from "./Pages/Dashboard/SellerDashboard/SellerPages/SellerProducts";
+import ShowAllProduct from "./Pages/Dashboard/SellerDashboard/SellerPages/ShowAllProduct";
+import OrderDetails from "./Pages/Dashboard/UserDashboard/MyOrder/OrderDetails";
+import CancelOrder from "./Pages/Dashboard/UserDashboard/MyOrder/CancelOrder";
+import RequestReturn from "./Pages/Dashboard/UserDashboard/MyOrder/MyReturn/RequestReturn";
+import SellerVerification from "./Pages/Dashboard/SellerDashboard/SellerDashboardView/SellerVerification";
 // import SingleProduct from "./Pages/HomePage/ProductPage/ProductDetailsPage/SingleProduct/SingleProduct";
 // import PrivateRoute from "./Pages/Shared/PrivetRoute/PrivetRoute";
 
@@ -180,7 +194,7 @@ const router = createBrowserRouter([
 //   element: <ProductDetailsPage />,
 // },
   {
-  path: "/productdetails/:title",
+  path: "/productdetails/:id/:title",
   element: <ProductDetailsPage />,
 },
 
@@ -302,17 +316,17 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/sellershop",
+    path: "/sellershop/:sellerId",
     element: <SellerUiPage />,
   },
   {
-    path: "/sellershop-category",
+    path: "/sellershop-category/:sellerId",
     element: <SellerShopCategoryProduct />,
   },
   {
-    path: "/seller-review",
+    path: "/seller-review/:sellerId",
     element: <SellerReview />,
-  },
+},
   {
     path: "/registration",
     element: <Registration />,
@@ -474,7 +488,7 @@ const router = createBrowserRouter([
     element: <AddAddressBook />,
   },
            {
-    path: "/dashboard/editaddress",
+    path: "/dashboard/editaddress/:id",
     element: <EditAddress />,
   },
            {
@@ -513,6 +527,14 @@ const router = createBrowserRouter([
             element: <MyOrders />,
           },
           {
+  path: "/dashboard/orderdetails/:id",
+  element: <OrderDetails />,
+},
+{
+  path: "/dashboard/cancelorder/:id",
+  element: <CancelOrder />,
+},
+          {
             path: "/dashboard/myreturn",
             element: <MyReturn />,
           },
@@ -521,11 +543,15 @@ const router = createBrowserRouter([
             element: <MyCancellations />,
           },
           {
-            path: "/dashboard/returndetails",
+  path: "/dashboard/requestreturn/:id",
+  element: <RequestReturn />,
+},
+          {
+            path: "/dashboard/returndetails/:id",
             element: <ReturnDetails />,
           },
           {
-            path: "/dashboard/canceldetails",
+            path: "/dashboard/canceldetails/:id",
             element: <CancellationDetails />,
           },
           {
@@ -541,7 +567,7 @@ const router = createBrowserRouter([
             element: <MyWishlist />,
           },
           {
-            path: "/dashboard/writereview",
+            path: "/dashboard/writereview/:orderId/:itemId",
             element: <WriteReview />,
           },
           {
@@ -881,5 +907,26 @@ const router = createBrowserRouter([
           },
   ],
 },
+
+
+{
+  path: "/sellerview",
+  element: <SellerLayout />,      // ← layout (fixed left+right)
+  children: [
+    { index: true, element: <SellerDashbaordView /> },  // /sellerview
+    { path: "products", element: <SellerUploadProducts /> },
+    { path: "showallproduct", element: <ShowAllProduct /> },
+    { path: "orders", element: <UpdateOrder /> },
+    { path: "purchase", element: <SellerPurchase /> },
+    { path: "messages", element: <SellerMessages /> },
+    { path: "wallet", element: <SellerWallet /> },
+    { path: "ledger", element: <SellerLedger /> },
+    { path: "lowstock", element: <LowStock /> },
+    { path: "stockout", element: <StockOut /> },
+    { path: "settings", element: <SellerSettings /> },
+    { path: "sellerverification", element: <SellerVerification /> },
+  ],
+},
+
 ]);
 export default router;
